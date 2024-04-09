@@ -5,29 +5,29 @@ export class CreatePeopleDto {
     @IsString()
     readonly name: string;
 
-    // @IsString()
-    // readonly birth_year: string;
+    @IsString()
+    readonly birth_year: string;
 
-    // @IsString()
-    // readonly eye_color: string;
+    @IsString()
+    readonly eye_color: string;
 
-    // @IsString()
-    // readonly gender: string;
+    @IsString()
+    readonly gender: string;
 
-    // @IsString()
-    // readonly hair_color: string;
+    @IsString()
+    readonly hair_color: string;
 
-    // @IsString()
-    // readonly height: string;
+    @IsString()
+    readonly height: string;
 
-    // @IsString()
-    // readonly mass: string;
+    @IsString()
+    readonly mass: string;
 
-    // @IsString()
-    // readonly skin_color: string;
+    @IsString()
+    readonly skin_color: string;
 
-    // @IsString()
-    // readonly homeworld: string;
+    @IsString()
+    readonly homeworld: string;
 
     // @IsArray()
     // @IsString({ each: true })

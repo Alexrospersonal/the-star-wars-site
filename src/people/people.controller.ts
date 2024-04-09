@@ -7,12 +7,13 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ImageFileValidationPipe } from 'src/files.validators';
 import { ImagesService } from 'src/images/images.service';
+import { DataBaseService } from 'src/database/database.service';
 
 @Controller('people')
 export class PeopleController {
     constructor(
         private readonly peopleService: PeopleService,
-        private readonly imagesService: ImagesService
+        private readonly dataBaseService: DataBaseService,
     ) { }
 
     // TODO: додати валідацію вхідних данних через pipe
@@ -30,9 +31,7 @@ export class PeopleController {
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        const imagesId = await this.imagesService.saveImages(files);
-        // this.peopleService.create(createPeople);
-        return true;
+        return await this.peopleService.create(createPeople, files);
     }
 
     @Get()

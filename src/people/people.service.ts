@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/people.entity';
 import { Repository } from 'typeorm';
 import { ImagesService } from 'src/images/images.service';
+import { DataBaseService } from 'src/database/database.service';
 
 
 let people: CreatePeopleDto[] = [
@@ -371,14 +372,10 @@ let people: CreatePeopleDto[] = [
 
 @Injectable()
 export class PeopleService {
-    constructor(
-        @InjectRepository(Person)
-        private peopleRepository: Repository<Person>
-    ) { }
+    constructor(private readonly dataBaseService: DataBaseService) { }
 
-    create(newPeople: CreatePeopleDto) {
-        this.peopleRepository.create(newPeople);
-        return true;
+    async create(person: CreatePeopleDto, files: Array<Express.Multer.File>) {
+        return await this.dataBaseService.createPerson(person, files);
     }
 
     findAll(skip: number) {

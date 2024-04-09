@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Person } from './people/entities/people.entity';
 import { ImagesModule } from './images/images.module';
+import { DatabaseModule } from './database/database.module';
+import { PlanetsModule } from './planets/planets.module';
 
 @Module({
   imports: [
@@ -18,7 +20,7 @@ import { ImagesModule } from './images/images.module';
       database: 'star_wars',
       autoLoadEntities: true,
       synchronize: true
-    }), PeopleModule, ImagesModule],
+    }), PeopleModule, ImagesModule, DatabaseModule, PlanetsModule],
   controllers: [AppController],
   providers: [AppService],
 })

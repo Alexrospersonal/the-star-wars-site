@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Image } from "src/images/images.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Person {
@@ -33,14 +34,14 @@ export class Person {
     @Column()
     homeworld: string;
 
-    @Column()
-    url: string;
+    @CreateDateColumn()
+    created: Date;
 
-    @Column()
-    created: string;
+    @UpdateDateColumn()
+    edited: Date;
 
-    @Column()
-    edited: string;
+    @OneToMany(() => Image, (image) => image.person)
+    images: Image[]
 }
 
 // readonly name: string;
