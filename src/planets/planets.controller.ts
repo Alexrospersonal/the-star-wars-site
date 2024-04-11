@@ -1,51 +1,57 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { DataBaseService } from "src/database/database.service";
-import { CreatePlanetDto } from "./planets.dto";
+import { CreatePlanetDto, UpdatePlanetDto } from "./planets.dto";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
 import { UpdatePeopleDto } from "src/people/people.dto";
+import { ImageFileValidationPipe } from "src/files.validators";
+import { PaginationType } from "src/people/people.pagination";
+import { PlanetsService } from "./planets.service";
+import { PlanetInterceptor } from "src/images/images.interceptor";
 
 @Controller('planets')
 export class PlanetsController {
-    constructor(private readonly dataBaseService: DataBaseService) { }
+    constructor(
+        private readonly dataBaseService: DataBaseService,
+        private readonly planetsService: PlanetsService
+    ) { }
 
     @Post()
-    @UseInterceptors(
-        FilesInterceptor('files', 10, {
-            storage: diskStorage({
-                destination: './uploads/planets',
-                filename: (req, file, cb) => {
-                    const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
-                    cb(null, `${randomName}${extname(file.originalname)}`);
-                }
-            })
-        })
-    )
-    async create(@Body() createPlanet: CreatePlanetDto) {
+    @UseInterceptors(PlanetInterceptor)
+    async create(
+        @Body() createPlanet: CreatePlanetDto,
+        @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
+    ) {
         // TODO: Call creating function from DB
+        return await this.dataBaseService.createPlanet(createPlanet, files);
     }
 
     @Get()
-    findAll() {
+    findAll(@Query() query: PaginationType) {
         // TODO: Gat first 10 planets from DB, use pagination
+        const skip = query.skip ? +query.skip : 0;
+        return this.dataBaseService.findAllPlanet(skip, 10)
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
+    async findOne(@Param('id', ParseIntPipe) id: number) {
         // TODO: Get one planet from DB
+        return await this.planetsService.getOnePlanet(id);
     }
 
     @Patch(':id')
-    update(
+    async update(
         @Param('id', ParseIntPipe) id: number,
-        @Body() updatePlanet: UpdatePeopleDto
+        @Body() updatePlanet: UpdatePlanetDto
     ) {
         // TODO: call updating function from DB
+        return await this.dataBaseService.updatePlanet(id, updatePlanet);
     }
 
     @Delete(':id')
-    delete(@Param('id', ParseIntPipe) id: number) {
+    async delete(@Param('id', ParseIntPipe) id: number) {
         // TODO: call deleting function from DB
+        return await this.dataBaseService.deletePlanet(id);
     }
 }
