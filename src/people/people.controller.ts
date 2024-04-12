@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
-import { PeoplePagination } from './people.pagination';
+import { PaginationType } from './people.pagination';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { ImageFileValidationPipe } from 'src/files.validators';
 import { ImagesService } from 'src/images/images.service';
 import { DataBaseService } from 'src/database/database.service';
+import { PeopleInterceptor } from 'src/images/images.interceptor';
 
 @Controller('people')
 export class PeopleController {
@@ -18,15 +19,7 @@ export class PeopleController {
 
     // TODO: додати валідацію вхідних данних через pipe
     @Post()
-    @UseInterceptors(FilesInterceptor('files', 10, {
-        storage: diskStorage({
-            destination: './uploads',
-            filename: (req, file, cb) => {
-                const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('');
-                cb(null, `${randomName}${extname(file.originalname)}`);
-            }
-        })
-    }))
+    @UseInterceptors(PeopleInterceptor)
     async create(
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
@@ -35,23 +28,26 @@ export class PeopleController {
     }
 
     @Get()
-    findAll(@Query() query: PeoplePagination) {
+    findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        return this.peopleService.findAll(skip);
+        return this.dataBaseService.findPeople(skip, 10);
     }
 
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) {
-        return this.peopleService.findOne(id);
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return await this.dataBaseService.findPerson(id);
     }
 
     @Patch(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updatePeople: UpdatePeopleDto) {
-        return this.peopleService.update(id, updatePeople);
+    async update(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() updatePeople: UpdatePeopleDto
+    ) {
+        return await this.dataBaseService.updatePerson(id, updatePeople);
     }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.peopleService.remove(id);
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        return await this.dataBaseService.deletePerson(id);
     }
 }

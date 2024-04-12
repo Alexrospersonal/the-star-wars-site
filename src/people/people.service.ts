@@ -5,6 +5,7 @@ import { Person } from './entities/people.entity';
 import { Repository } from 'typeorm';
 import { ImagesService } from 'src/images/images.service';
 import { DataBaseService } from 'src/database/database.service';
+import { Image } from 'src/images/images.entity';
 
 
 let people: CreatePeopleDto[] = [
@@ -372,7 +373,10 @@ let people: CreatePeopleDto[] = [
 
 @Injectable()
 export class PeopleService {
-    constructor(private readonly dataBaseService: DataBaseService) { }
+    constructor(
+        private readonly dataBaseService: DataBaseService,
+        private readonly imagesService: ImagesService
+    ) { }
 
     async create(person: CreatePeopleDto, files: Array<Express.Multer.File>) {
         return await this.dataBaseService.createPerson(person, files);
@@ -389,11 +393,12 @@ export class PeopleService {
         return people.slice(skip, skip + 10);
     }
 
-    findOne(id: number) {
-        if (id < people.length) {
-            return people[id]
-        }
-        throw new NotFoundException();
+    async findOne(id: number) {
+        const person = await this.dataBaseService.findPerson(id);
+
+        person.images = this.imagesService.convertFilenametoURL(person.images);
+
+        return person;
     }
 
     update(id: number, updatedPeople: UpdatePeopleDto) {

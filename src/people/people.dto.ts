@@ -1,5 +1,5 @@
 import { PartialType } from "@nestjs/swagger";
-import { ArrayMinSize, IsArray, IsString } from "class-validator";
+import { ArrayMinSize, IsArray, IsNumber, IsString } from "class-validator";
 
 export class CreatePeopleDto {
     @IsString()
@@ -26,8 +26,8 @@ export class CreatePeopleDto {
     @IsString()
     readonly skin_color: string;
 
-    @IsString()
-    readonly homeworld: string;
+    @IsNumber()
+    readonly homeworld: number;
 
     // @IsArray()
     // @IsString({ each: true })
