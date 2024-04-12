@@ -4,7 +4,6 @@ import { ImagesService } from 'src/images/images.service';
 import { DataBaseService } from 'src/database/database.service';
 
 
-
 @Injectable()
 export class PeopleService {
     constructor(
