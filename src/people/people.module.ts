@@ -1,13 +1,18 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { PeopleController } from './people.controller';
 import { PeopleService } from './people.service';
-import { DatabaseModule } from 'src/database/database.module';
 import { ImagesModule } from 'src/images/images.module';
 import { PlanetsModule } from 'src/planets/planets.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Person } from './entities/people.entity';
 
 @Module({
-  imports: [DatabaseModule, ImagesModule, forwardRef(() => PlanetsModule)],
+  imports: [
+    ImagesModule, forwardRef(() => PlanetsModule),
+    TypeOrmModule.forFeature([Person])
+  ],
   controllers: [PeopleController],
   providers: [PeopleService],
+  exports: [PeopleService]
 })
 export class PeopleModule { }
