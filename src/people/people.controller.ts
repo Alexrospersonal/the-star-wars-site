@@ -11,7 +11,6 @@ export class PeopleController {
         private readonly peopleService: PeopleService,
     ) { }
 
-    // TODO: додати валідацію вхідних данних через pipe
     @Post()
     @UseInterceptors(PeopleInterceptor)
     async create(

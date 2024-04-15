@@ -6,6 +6,7 @@ import { IMAGE_BASE_PATH } from "src/settings";
 
 export const PlanetInterceptor = createImageInterceptor('planets');
 export const PeopleInterceptor = createImageInterceptor('people');
+export const SpeciesInterceptor = createImageInterceptor('species');
 
 function createImageInterceptor(imageFilesDir: string) {
     return FilesInterceptor('files', 10, {
