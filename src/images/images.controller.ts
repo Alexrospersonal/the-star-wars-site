@@ -14,7 +14,6 @@ export class ImagesController {
         @Req() req: Request,
         @Res() res: Response
     ) {
-        // const imagePath = req.url.replace('/images/', '');
         const file = path.join(process.cwd(), 'uploads', req.url);
         return res.sendFile(file);
     }

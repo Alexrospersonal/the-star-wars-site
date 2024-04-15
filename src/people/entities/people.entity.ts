@@ -43,4 +43,9 @@ export class Person {
 
     @OneToMany(() => Image, (image) => image.person)
     images: Image[]
+
+    // FILMS
+    // species
+    // starships
+    // vehicles
 }

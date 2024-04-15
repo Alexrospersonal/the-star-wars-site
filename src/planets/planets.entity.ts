@@ -46,4 +46,6 @@ export class Planet {
     @OneToMany(() => Image, (image) => image.planet)
     images: Image[]
 
+    // FILMS
+
 }

@@ -1,8 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UseInterceptors } from "@nestjs/common";
 import { DataBaseService } from "src/database/database.service";
 import { ImagesService } from "src/images/images.service";
+import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
+
 
 @Injectable()
+@UseInterceptors(FileUrlTransformInteceptor)
 export class PlanetsService {
     constructor(
         private readonly dataBaseService: DataBaseService,
@@ -12,7 +15,7 @@ export class PlanetsService {
     async getOnePlanet(id: number) {
         const planet = await this.dataBaseService.findOnePlanet(id);
 
-        planet.images = this.imagesService.convertFilenametoURL(planet.images);
+        // planet.images = this.imagesService.convertFilenametoURL(planet.images);
 
         return planet;
     }
