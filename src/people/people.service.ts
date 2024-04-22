@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/people.entity';
 import { Repository } from 'typeorm';
 import { PlanetsService } from 'src/planets/planets.service';
+import { SpeciesService } from 'src/species/species.service';
 
 
 @Injectable()
@@ -15,16 +16,12 @@ export class PeopleService {
         @InjectRepository(Person)
         private peopleRepository: Repository<Person>,
         private readonly imagesService: ImagesService,
-        private readonly planetsService: PlanetsService
+        private readonly planetsService: PlanetsService,
+        private readonly speciesService: SpeciesService,
     ) { }
 
-    async create(person: CreatePeopleDto, files: Array<Express.Multer.File>) {
-        return await this.createPerson(person, files);
-    }
     async findOne(id: number) {
         const person = await this.findPerson(id);
-
-        // person.images = this.imagesService.convertFilenametoURL(person.images);
 
         return person;
     }
@@ -33,9 +30,11 @@ export class PeopleService {
         const images = await this.imagesService.saveImages(files);
 
         const homeworld = await this.planetsService.getHomeword(personData.homeworld);
+        const specie = await this.speciesService.findSpecie(personData.specie)
 
         if (!homeworld)
             throw new NotFoundException(`Homeword #${personData.homeworld} not found`);
+
 
         const person = this.peopleRepository.create({
             name: personData.name,
@@ -46,13 +45,14 @@ export class PeopleService {
             height: personData.height,
             mass: personData.mass,
             skin_color: personData.skin_color,
-            homeworld: homeworld,
-            images: images
+            homeworld: Promise.resolve(homeworld),
+            specie: Promise.resolve(specie),
+            images: Promise.resolve(images)
         });
 
         const createdPerson = await this.peopleRepository.save(person);
 
-        await this.planetsService.addNewResident(createdPerson.homeworld, createdPerson);
+        await this.planetsService.addNewResident(homeworld, createdPerson);
 
         return createdPerson;
     }
@@ -70,7 +70,7 @@ export class PeopleService {
             where: {
                 id: id
             },
-            relations: ['images', 'homeworld']
+            relations: ['images', 'homeworld', 'specie']
         });
     }
 
@@ -78,19 +78,23 @@ export class PeopleService {
         const updatedObject = {
             id: id,
             ...updatePersonData,
-            homeworld: await this.planetsService.getHomeword(updatePersonData.homeworld)
+            homeworld: Promise.resolve(await this.planetsService.getHomeword(updatePersonData.homeworld)),
+            specie: Promise.resolve(await this.speciesService.findSpecie(updatePersonData.specie)),
         };
 
         const oldPerson = await this.peopleRepository.findOne({ where: { id: id } });
         const newPerson = await this.peopleRepository.preload(updatedObject);
 
+        const oldPersonHomeworld = await oldPerson.homeworld;
+        const newPersonHomeworld = await newPerson.homeworld;
+
         if (!newPerson)
             throw new NotFoundException(`Person #${id} not found`);
 
-        if (oldPerson.homeworld.id !== newPerson.homeworld.id) {
+        if (oldPersonHomeworld.id !== newPersonHomeworld.id) {
 
-            const oldPlanet = await this.planetsService.findOnePlanet(oldPerson.homeworld.id);
-            const newPlanet = await this.planetsService.findOnePlanet(newPerson.homeworld.id);
+            const oldPlanet = await this.planetsService.findOnePlanet(oldPersonHomeworld.id);
+            const newPlanet = await this.planetsService.findOnePlanet(newPersonHomeworld.id);
 
             await this.planetsService.removeResident(oldPlanet, oldPerson);
             await this.planetsService.addNewResident(newPlanet, newPerson);

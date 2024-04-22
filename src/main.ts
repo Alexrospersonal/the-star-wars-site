@@ -3,11 +3,15 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { DataTransformInteceptor } from './interceptors/dataTransform.interceptor';
+import { FileUrlTransformInteceptor } from './interceptors/fileUrlTransform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalInterceptors(new DataTransformInteceptor());
+  app.useGlobalInterceptors(
+    new DataTransformInteceptor(),
+    new FileUrlTransformInteceptor()
+  );
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,

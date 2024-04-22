@@ -1,5 +1,6 @@
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "src/planets/planets.entity";
+import { Species } from "src/species/species.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -16,4 +17,10 @@ export class Image {
 
     @ManyToOne(() => Planet, (planet) => planet.images)
     planet: Person
+
+    @ManyToOne(() => Planet, (specie) => specie.images)
+    specie: Species
+
+    @ManyToOne(() => Planet, (starship) => starship.images)
+    starship: Species
 }

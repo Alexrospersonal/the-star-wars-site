@@ -4,6 +4,7 @@ import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
 import { ImageFileValidationPipe } from 'src/files.validators';
 import { PeopleInterceptor } from 'src/images/images.interceptor';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Controller('people')
 export class PeopleController {
@@ -17,7 +18,7 @@ export class PeopleController {
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        return await this.peopleService.create(createPeople, files);
+        return await this.peopleService.createPerson(createPeople, files);
     }
 
     @Get()
@@ -26,9 +27,13 @@ export class PeopleController {
         return this.peopleService.findPeople(skip, 10);
     }
 
+    @ApiProperty({
+        description: 'The id of the person'
+    })
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        return await this.peopleService.findPerson(id);
+        const person = await this.peopleService.findPerson(id);
+        return await person.toResponseObject();
     }
 
     @Patch(':id')

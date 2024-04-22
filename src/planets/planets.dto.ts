@@ -2,43 +2,41 @@ import { ApiProperty, PartialType } from "@nestjs/swagger";
 import { IsString } from "class-validator";
 
 export class CreatePlanetDto {
-    @ApiProperty({
-
-    })
+    @ApiProperty()
     @IsString()
-    name: string;
+    readonly name: string;
 
     @ApiProperty()
     @IsString()
-    diameter: string;
+    readonly diameter: string;
 
     @ApiProperty()
     @IsString()
-    rotation_period: string;
+    readonly rotation_period: string;
 
     @ApiProperty()
     @IsString()
-    orbital_period: string;
+    readonly orbital_period: string;
 
     @ApiProperty()
     @IsString()
-    gravity: string;
+    readonly gravity: string;
 
     @ApiProperty()
     @IsString()
-    population: string;
+    readonly population: string;
 
     @ApiProperty()
     @IsString()
-    climate: string;
+    readonly climate: string;
 
     @ApiProperty()
     @IsString()
-    terrain: string;
+    readonly terrain: string;
 
     @ApiProperty()
     @IsString()
-    surface_water: string;
+    readonly surface_water: string;
 
     // films array
 }

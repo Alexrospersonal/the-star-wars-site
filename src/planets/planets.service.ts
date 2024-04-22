@@ -36,7 +36,7 @@ export class PlanetsService {
             climate: planetData.climate,
             terrain: planetData.terrain,
             surface_water: planetData.surface_water,
-            residents: [],
+            residents: Promise.resolve([]),
             images: images
         });
 
@@ -105,14 +105,20 @@ export class PlanetsService {
     }
 
     public async addNewResident(planet: Planet, resident: Person) {
-        planet.residents.push(resident);
+        const residents = await planet.residents;
+        residents.push(resident);
+
+        planet.residents = Promise.resolve(residents);
         await this.planetRepository.save(planet);
     }
 
     public async removeResident(planet: Planet, resident: Person) {
-        planet.residents = planet.residents.filter((person, idx, arr) => {
-            person !== resident
-        });
+        const residents = await planet.residents;
+        planet.residents = Promise.resolve(
+            residents.filter((person, idx, arr) => {
+                person !== resident
+            })
+        )
         await this.planetRepository.save(planet);
     }
 }

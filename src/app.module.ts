@@ -7,6 +7,7 @@ import { DataSource } from 'typeorm';
 import { ImagesModule } from './images/images.module';
 import { PlanetsModule } from './planets/planets.module';
 import { SpeciesModule } from './species/species.module';
+import { StarshipsModule } from './starships/starships.module';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { SpeciesModule } from './species/species.module';
       database: 'star_wars',
       autoLoadEntities: true,
       synchronize: true
-    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule],
+    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -11,8 +11,9 @@ export class FileUrlTransformInteceptor implements NestInterceptor {
             .pipe(
                 map(
                     data => {
-                        if (Array.isArray(data) && data.every(item => item instanceof Image)) {
-                            // return this.convertFilenametoURL(data);
+                        if (data && Array.isArray(data.images) && data.images.every(item => item instanceof Image)) {
+                            data.images = this.convertFilenametoURL(data.images);
+                            return data;
                         } else {
                             return data;
                         }

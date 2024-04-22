@@ -1,6 +1,7 @@
 import { Person } from "src/people/entities/people.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Image } from "src/images/images.entity";
+import { Species } from "src/species/species.entity";
 
 @Entity()
 export class Planet {
@@ -34,8 +35,8 @@ export class Planet {
     @Column()
     surface_water: string;
 
-    @OneToMany(() => Person, (person) => person.homeworld)
-    residents: Person[]
+    @OneToMany(() => Person, (person) => person.homeworld, { lazy: true })
+    residents: Promise<Person[]>
 
     @CreateDateColumn()
     created: Date;
@@ -45,6 +46,9 @@ export class Planet {
 
     @OneToMany(() => Image, (image) => image.planet)
     images: Image[]
+
+    // @ManyToOne(() => Species, (specie) => specie.homeworld)
+    // specie: Species
 
     // FILMS
 
