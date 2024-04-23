@@ -19,19 +19,19 @@ export class StarshipsController {
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
         const starship = await this.starshipsService.createStarship(starshipData, files);
-        return starship
+        return await starship.toResponseObject()
     }
 
     @Get(':id')
     public async findOne(@Param('id', ParseIntPipe) id: number) {
         const starship = await this.starshipsService.findStarship(id);
-        return starship
+        return await starship.toResponseObject()
     }
 
     @Get()
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        return this.starshipsService.findStarships(skip, 10);
+        this.starshipsService.findStarships(skip, 10);
     }
 
     @Patch(':id')
@@ -39,11 +39,13 @@ export class StarshipsController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateStarship: UpdateStarshipDto
     ) {
-        return await this.starshipsService.updateStarship(id, updateStarship);
+        const starship = await this.starshipsService.updateStarship(id, updateStarship);
+        return await starship.toResponseObject()
     }
 
     @Delete(':id')
     public async delete(@Param('id', ParseIntPipe) id: number) {
-        return await this.starshipsService.deleteStarship(id);
+        const starship = await this.starshipsService.deleteStarship(id);
+        return await starship.toResponseObject()
     }
 }

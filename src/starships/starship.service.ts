@@ -3,9 +3,12 @@ import { CreateStarshipDto, UpdateStarshipDto } from "./starship.dto";
 import { Starships } from "./starship.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ImagesService } from "src/images/images.service";
-import { NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { PeopleService } from "src/people/people.service";
+import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
 
+@Injectable()
+@UseInterceptors(FileUrlTransformInteceptor)
 export class StarshipsService {
 
     constructor(

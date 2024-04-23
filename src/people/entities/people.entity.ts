@@ -5,7 +5,7 @@ import { Planet } from "src/planets/planets.entity";
 import { BASE_URL } from "src/settings";
 import { Species } from "src/species/species.entity";
 import { Starships } from "src/starships/starship.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
 // TODO: Species та Image як lazy
@@ -60,9 +60,11 @@ export class Person {
     images: Promise<Image[]>
 
     @OneToMany(() => Starships, (starships) => starships.pilots, { lazy: true })
+    @JoinColumn({ name: "starship_id" })
     starships: Promise<Starships[]>
 
-    @ManyToOne(() => Species, (specie) => specie.people, { lazy: true })
+    @ManyToMany(() => Species, (specie) => specie.people, { lazy: true })
+    @JoinTable()
     specie: Promise<Species>
 
     async toResponseObject() {

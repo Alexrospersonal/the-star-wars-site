@@ -2,7 +2,7 @@ import { IsString } from "class-validator";
 import { Image } from "src/images/images.entity";
 import { Person } from "src/people/entities/people.entity";
 import { BASE_URL } from "src/settings";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Starships {
@@ -60,7 +60,8 @@ export class Starships {
 
     // films: Film[]
 
-    @OneToMany(() => Person, (person) => person.starships, { lazy: true })
+    @ManyToMany(() => Person, (person) => person.starships, { lazy: true })
+    @JoinTable()
     pilots: Promise<Person[]>
 
     starship_class: string;

@@ -4,8 +4,11 @@ import { Species } from "./species.entity";
 import { Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { PlanetsService } from "src/planets/planets.service";
-import { NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
+import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
 
+@Injectable()
+@UseInterceptors(FileUrlTransformInteceptor)
 export class SpeciesService {
 
     constructor(
