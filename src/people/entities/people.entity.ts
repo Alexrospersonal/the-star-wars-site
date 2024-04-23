@@ -1,5 +1,6 @@
 import { Exclude } from "class-transformer";
 import { IsString } from "class-validator";
+import { Films } from "src/films/films.entity";
 import { Image } from "src/images/images.entity";
 import { Planet } from "src/planets/planets.entity";
 import { BASE_URL } from "src/settings";
@@ -70,6 +71,10 @@ export class Person {
 
     @OneToMany(() => Species, (specie) => specie.people, { lazy: true })
     specie: Promise<Species>
+
+    @ManyToMany(() => Films, (films) => films.characters, { lazy: true })
+    @JoinTable()
+    films: Promise<Person[]>
 
     async toResponseObject() {
         const homeworld = await this.homeworld;

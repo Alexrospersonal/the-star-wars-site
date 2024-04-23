@@ -1,9 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Image } from "src/images/images.entity";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "src/planets/planets.entity";
 import { last } from "rxjs";
 import { BASE_URL } from "src/settings";
+import { Films } from "src/films/films.entity";
 
 @Entity()
 export class Species {
@@ -54,6 +55,10 @@ export class Species {
 
     @OneToMany(() => Image, (image) => image.specie)
     images: Image[]
+
+    @ManyToMany(() => Films, (films) => films.species, { lazy: true })
+    @JoinTable()
+    films: Promise<Films[]>
 
     async toResponseObject() {
         const homeworld = await this.homeworld;

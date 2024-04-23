@@ -4,7 +4,7 @@ import { ImagesService } from 'src/images/images.service';
 import { FileUrlTransformInteceptor } from 'src/interceptors/fileUrlTransform.interceptor';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/people.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { PlanetsService } from 'src/planets/planets.service';
 import { SpeciesService } from 'src/species/species.service';
 
@@ -118,5 +118,15 @@ export class PeopleService {
         // await this.planetRepository.save(planet);
 
         return removedPerson;
+    }
+
+    public async getPeopleByIds(ids: number[]) {
+        const people = await this.peopleRepository.findBy({
+            id: In(ids)
+        })
+        if (!people) {
+            throw new NotFoundException(`People not found`);
+        }
+        return people;
     }
 }

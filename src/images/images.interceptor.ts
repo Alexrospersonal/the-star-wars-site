@@ -9,6 +9,7 @@ export const PeopleInterceptor = createImageInterceptor('people');
 export const SpeciesInterceptor = createImageInterceptor('species');
 export const StarshipsInterceptor = createImageInterceptor('starships');
 export const VehiclessInterceptor = createImageInterceptor('vehicles');
+export const FilmsInterceptor = createImageInterceptor('films');
 
 function createImageInterceptor(imageFilesDir: string) {
     return FilesInterceptor('files', 10, {

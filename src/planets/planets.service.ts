@@ -4,7 +4,7 @@ import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.in
 import { CreatePlanetDto, UpdatePlanetDto } from "./planets.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Planet } from "./planets.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Person } from "src/people/entities/people.entity";
 
 
@@ -120,5 +120,15 @@ export class PlanetsService {
             })
         )
         await this.planetRepository.save(planet);
+    }
+
+    public async getPlanetByIds(ids: number[]) {
+        const people = await this.planetRepository.findBy({
+            id: In(ids)
+        })
+        if (!people) {
+            throw new NotFoundException(`People not found`);
+        }
+        return people;
     }
 }

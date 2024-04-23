@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { CreateStarshipDto, UpdateStarshipDto } from "./starship.dto";
 import { Starships } from "./starship.entity";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -67,5 +67,15 @@ export class StarshipsService {
             throw new NotFoundException(`Starship #${id} not found`);
 
         return await this.starshipRepository.remove(starship);
+    }
+
+    public async getStarshipsByIds(ids: number[]) {
+        const starships = await this.starshipRepository.findBy({
+            id: In(ids)
+        })
+        if (!starships) {
+            throw new NotFoundException(`People not found`);
+        }
+        return starships;
     }
 }

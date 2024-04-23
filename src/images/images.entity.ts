@@ -1,3 +1,4 @@
+import { Films } from "src/films/films.entity";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "src/planets/planets.entity";
 import { Species } from "src/species/species.entity";
@@ -23,4 +24,7 @@ export class Image {
 
     @ManyToOne(() => Planet, (starship) => starship.images)
     starship: Species
+
+    @ManyToOne(() => Films, (film) => film.images)
+    film: Species
 }

@@ -1,7 +1,8 @@
 import { Person } from "src/people/entities/people.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Image } from "src/images/images.entity";
 import { Species } from "src/species/species.entity";
+import { Films } from "src/films/films.entity";
 
 @Entity()
 export class Planet {
@@ -47,9 +48,8 @@ export class Planet {
     @OneToMany(() => Image, (image) => image.planet)
     images: Image[]
 
-    // @ManyToOne(() => Species, (specie) => specie.homeworld)
-    // specie: Species
-
-    // FILMS
+    @ManyToMany(() => Films, (films) => films.planets, { lazy: true })
+    @JoinTable()
+    films: Promise<Films[]>
 
 }

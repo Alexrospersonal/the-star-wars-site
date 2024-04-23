@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
 import { Vehicles } from "./vehicles.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
 
@@ -66,5 +66,15 @@ export class VehiclesService {
             throw new NotFoundException(`Vehicle #${id} not found`);
 
         return await this.vehiclesRepository.remove(vehicle);
+    }
+
+    public async getVehiclesByIds(ids: number[]) {
+        const vehicles = await this.vehiclesRepository.findBy({
+            id: In(ids)
+        })
+        if (!vehicles) {
+            throw new NotFoundException(`People not found`);
+        }
+        return vehicles;
     }
 }

@@ -42,34 +42,6 @@ export class CreatePeopleDto {
     @IsNumber()
     readonly specie: number;
 
-    // @IsArray()
-    // @IsString({ each: true })
-    // @ArrayMinSize(1)
-    // readonly films: string[];
-
-    // @IsArray()
-    // @IsString({ each: true })
-    // @ArrayMinSize(1)
-    // readonly species: string[];
-
-    // @IsArray()
-    // @IsString({ each: true })
-    // @ArrayMinSize(1)
-    // readonly starships: string[];
-
-    // @IsArray()
-    // @IsString({ each: true })
-    // @ArrayMinSize(1)
-    // readonly vehicles: string[];
-
-    // @IsString()
-    // readonly url: string;
-
-    // @IsString()
-    // readonly created: string;
-
-    // @IsString()
-    // readonly edited: string;
 }
 
 export class UpdatePeopleDto extends PartialType(CreatePeopleDto) { }

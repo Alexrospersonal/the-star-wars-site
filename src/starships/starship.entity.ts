@@ -1,4 +1,5 @@
 import { IsString } from "class-validator";
+import { Films } from "src/films/films.entity";
 import { Image } from "src/images/images.entity";
 import { Person } from "src/people/entities/people.entity";
 import { BASE_URL } from "src/settings";
@@ -74,6 +75,10 @@ export class Starships {
 
     @OneToMany(() => Image, (image) => image.starship)
     images: Image[]
+
+    @ManyToMany(() => Films, (films) => films.starships, { lazy: true })
+    @JoinTable()
+    films: Promise<Films[]>
 
     async toResponseObject() {
         const pilots = await this.pilots;

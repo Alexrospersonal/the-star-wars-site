@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateSpeciesDto, UpdateSpeciesDto } from "./species.dto";
 import { Species } from "./species.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { PlanetsService } from "src/planets/planets.service";
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
@@ -42,7 +42,7 @@ export class SpeciesService {
             where: {
                 id: id
             },
-            relations: ['images', 'people']
+            relations: ['images', 'homeworld', 'people']
         })
     }
 
@@ -66,7 +66,7 @@ export class SpeciesService {
 
         const updatedSpecie = await this.speciesRepository.preload(updateSpecie)
 
-        return await this.speciesRepository.save(updatedSpecie); 44
+        return await this.speciesRepository.save(updatedSpecie);
 
     }
 
@@ -77,6 +77,16 @@ export class SpeciesService {
             throw new NotFoundException(`Specie #${id} not found`);
 
         return await this.speciesRepository.remove(specie);
+    }
+
+    public async getSpesiesByIds(ids: number[]) {
+        const specie = await this.speciesRepository.findBy({
+            id: In(ids)
+        })
+        if (!specie) {
+            throw new NotFoundException(`People not found`);
+        }
+        return specie;
     }
 
 }
