@@ -8,6 +8,7 @@ export const PlanetInterceptor = createImageInterceptor('planets');
 export const PeopleInterceptor = createImageInterceptor('people');
 export const SpeciesInterceptor = createImageInterceptor('species');
 export const StarshipsInterceptor = createImageInterceptor('starships');
+export const VehiclessInterceptor = createImageInterceptor('vehicles');
 
 function createImageInterceptor(imageFilesDir: string) {
     return FilesInterceptor('files', 10, {

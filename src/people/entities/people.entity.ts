@@ -5,6 +5,7 @@ import { Planet } from "src/planets/planets.entity";
 import { BASE_URL } from "src/settings";
 import { Species } from "src/species/species.entity";
 import { Starships } from "src/starships/starship.entity";
+import { Vehicles } from "src/vehicles/vehicles.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
@@ -59,12 +60,15 @@ export class Person {
     @OneToMany(() => Image, (image) => image.person, { lazy: true })
     images: Promise<Image[]>
 
-    @OneToMany(() => Starships, (starships) => starships.pilots, { lazy: true })
-    @JoinColumn({ name: "starship_id" })
+    @ManyToMany(() => Starships, (starships) => starships.pilots, { lazy: true })
+    @JoinTable()
     starships: Promise<Starships[]>
 
-    @ManyToMany(() => Species, (specie) => specie.people, { lazy: true })
+    @ManyToMany(() => Starships, (vehicles) => vehicles.pilots, { lazy: true })
     @JoinTable()
+    vehicles: Promise<Vehicles[]>
+
+    @OneToMany(() => Species, (specie) => specie.people, { lazy: true })
     specie: Promise<Species>
 
     async toResponseObject() {

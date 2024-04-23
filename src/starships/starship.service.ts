@@ -68,6 +68,4 @@ export class StarshipsService {
 
         return await this.starshipRepository.remove(starship);
     }
-
-
 }

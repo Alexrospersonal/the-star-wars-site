@@ -8,6 +8,7 @@ import { ImagesModule } from './images/images.module';
 import { PlanetsModule } from './planets/planets.module';
 import { SpeciesModule } from './species/species.module';
 import { StarshipsModule } from './starships/starships.module';
+import { VehiclesModule } from './vehicles/vehicles.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { StarshipsModule } from './starships/starships.module';
       database: 'star_wars',
       autoLoadEntities: true,
       synchronize: true
-    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule],
+    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule],
   controllers: [AppController],
   providers: [AppService],
 })

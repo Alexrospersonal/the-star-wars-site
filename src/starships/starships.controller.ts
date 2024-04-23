@@ -31,7 +31,7 @@ export class StarshipsController {
     @Get()
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        this.starshipsService.findStarships(skip, 10);
+        return await this.starshipsService.findStarships(skip, 10);
     }
 
     @Patch(':id')
