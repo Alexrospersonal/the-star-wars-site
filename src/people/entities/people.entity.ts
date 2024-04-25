@@ -10,7 +10,6 @@ import { Vehicles } from "src/vehicles/vehicles.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
-// TODO: Species та Image як lazy
 @Entity()
 export class Person {
 
@@ -65,19 +64,18 @@ export class Person {
     @JoinTable()
     starships: Promise<Starships[]>
 
-    @ManyToMany(() => Starships, (vehicles) => vehicles.pilots, { lazy: true })
+    @ManyToMany(() => Vehicles, (vehicles) => vehicles.pilots, { lazy: true })
     @JoinTable()
     vehicles: Promise<Vehicles[]>
 
-    @OneToMany(() => Species, (specie) => specie.people, { lazy: true })
+    @ManyToOne(() => Species, (specie) => specie.people, { lazy: true })
     specie: Promise<Species>
 
     @ManyToMany(() => Films, (films) => films.characters, { lazy: true })
     @JoinTable()
-    films: Promise<Person[]>
+    films: Promise<Films[]>
 
     async toResponseObject() {
-        const homeworld = await this.homeworld;
         return {
             id: this.id,
             name: this.name,
@@ -88,11 +86,15 @@ export class Person {
             height: this.height,
             mass: this.mass,
             skin_color: this.skin_color,
-            images: this.images,
-            specie: this.specie,
+            images: await this.images,
+            specie: await this.specie,
+            films: await this.films,
+            starships: await this.starships,
+            vehicles: await this.vehicles,
+            homeworld: await this.homeworld,
             created: this.created,
             edited: this.edited,
-            homeworld: `${BASE_URL}planets/${homeworld.id}`
+
         }
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { ImagesService } from "src/images/images.service";
-import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 import { CreatePlanetDto, UpdatePlanetDto } from "./planets.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Planet } from "./planets.entity";
@@ -9,7 +9,7 @@ import { Person } from "src/people/entities/people.entity";
 
 
 @Injectable()
-@UseInterceptors(FileUrlTransformInteceptor)
+@UseInterceptors(FileUrlTransformInterceptor)
 export class PlanetsService {
     constructor(
         private readonly imagesService: ImagesService,

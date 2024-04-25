@@ -5,10 +5,10 @@ import { In, Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { PlanetsService } from "src/planets/planets.service";
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
-import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 
 @Injectable()
-@UseInterceptors(FileUrlTransformInteceptor)
+@UseInterceptors(FileUrlTransformInterceptor)
 export class SpeciesService {
 
     constructor(

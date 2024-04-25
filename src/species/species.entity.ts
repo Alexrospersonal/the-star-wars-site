@@ -41,9 +41,6 @@ export class Species {
     @OneToMany(() => Person, (person) => person.specie, { lazy: true })
     people: Promise<Person[]>
 
-    // @ManyToOne(() => Planet, (planet) => planet.id)
-    // homeworld: Planet;
-
     @ManyToOne(() => Planet, { lazy: true })
     homeworld: Promise<Planet>;
 

@@ -5,10 +5,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ImagesService } from "src/images/images.service";
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { PeopleService } from "src/people/people.service";
-import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 
 @Injectable()
-@UseInterceptors(FileUrlTransformInteceptor)
+@UseInterceptors(FileUrlTransformInterceptor)
 export class StarshipsService {
 
     constructor(

@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FileUrlTransformInteceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 import { Vehicles } from "./vehicles.entity";
 import { In, Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
 
 @Injectable()
-@UseInterceptors(FileUrlTransformInteceptor)
+@UseInterceptors(FileUrlTransformInterceptor)
 export class VehiclesService {
 
     constructor(

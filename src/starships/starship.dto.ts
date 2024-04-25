@@ -49,7 +49,6 @@ export class CreateStarshipDto {
     @ApiProperty()
     @IsString()
     passengers: string;
-    // films: number[]
 
     @ApiProperty()
     @IsString()

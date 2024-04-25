@@ -5,6 +5,7 @@ import { PaginationType } from './people.pagination';
 import { ImageFileValidationPipe } from 'src/files.validators';
 import { PeopleInterceptor } from 'src/images/images.interceptor';
 import { ApiProperty } from '@nestjs/swagger';
+import { PersonInterceptor } from './people.interceptos';
 
 @Controller('people')
 export class PeopleController {
@@ -18,34 +19,37 @@ export class PeopleController {
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        return await this.peopleService.createPerson(createPeople, files);
+        return (await this.peopleService.createPerson(createPeople, files)).toResponseObject();
     }
 
     @Get()
-    findAll(@Query() query: PaginationType) {
+    @UseInterceptors(PersonInterceptor)
+    async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        return this.peopleService.findPeople(skip, 10);
+        const people = await this.peopleService.findPeople(skip, 10);
+        return Promise.all(people.map(async (people) => await people.toResponseObject()));
     }
 
-    @ApiProperty({
-        description: 'The id of the person'
-    })
+    @ApiProperty({ description: 'The id of the person' })
     @Get(':id')
+    @UseInterceptors(PersonInterceptor)
     async findOne(@Param('id', ParseIntPipe) id: number) {
         const person = await this.peopleService.findPerson(id);
         return await person.toResponseObject();
     }
 
     @Patch(':id')
+    @UseInterceptors(PersonInterceptor)
     async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updatePeople: UpdatePeopleDto
     ) {
-        return await this.peopleService.updatePerson(id, updatePeople);
+        return (await this.peopleService.updatePerson(id, updatePeople)).toResponseObject();
     }
 
     @Delete(':id')
+    @UseInterceptors(PersonInterceptor)
     async remove(@Param('id', ParseIntPipe) id: number) {
-        return await this.peopleService.deletePerson(id);
+        return (await this.peopleService.deletePerson(id)).toResponseObject();
     }
 }

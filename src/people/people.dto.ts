@@ -42,6 +42,15 @@ export class CreatePeopleDto {
     @IsNumber()
     readonly specie: number;
 
+    @ApiProperty()
+    @IsArray()
+    // @IsNumber({}, { each: true })
+    readonly starships: number[];
+
+    @ApiProperty()
+    @IsArray()
+    // @IsNumber({}, { each: true })
+    readonly vehicles: number[];
 }
 
 export class UpdatePeopleDto extends PartialType(CreatePeopleDto) { }

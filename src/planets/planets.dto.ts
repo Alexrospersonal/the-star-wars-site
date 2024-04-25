@@ -37,8 +37,6 @@ export class CreatePlanetDto {
     @ApiProperty()
     @IsString()
     readonly surface_water: string;
-
-    // films array
 }
 
 

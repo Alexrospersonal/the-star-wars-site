@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { ImagesService } from 'src/images/images.service';
-import { FileUrlTransformInteceptor } from 'src/interceptors/fileUrlTransform.interceptor';
+import { FileUrlTransformInterceptor } from 'src/interceptors/fileUrlTransform.interceptor';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/people.entity';
 import { In, Repository } from 'typeorm';
 import { PlanetsService } from 'src/planets/planets.service';
 import { SpeciesService } from 'src/species/species.service';
+import { VehiclesService } from 'src/vehicles/vehicles.service';
+import { StarshipsService } from 'src/starships/starship.service';
 
 
 @Injectable()
-@UseInterceptors(FileUrlTransformInteceptor)
+@UseInterceptors(FileUrlTransformInterceptor)
 export class PeopleService {
     constructor(
         @InjectRepository(Person)
@@ -18,6 +20,8 @@ export class PeopleService {
         private readonly imagesService: ImagesService,
         private readonly planetsService: PlanetsService,
         private readonly speciesService: SpeciesService,
+        private readonly vehiclesService: VehiclesService,
+        private readonly starshipsService: StarshipsService
     ) { }
 
     async findOne(id: number) {
@@ -30,24 +34,22 @@ export class PeopleService {
         const images = await this.imagesService.saveImages(files);
 
         const homeworld = await this.planetsService.getHomeword(personData.homeworld);
-        const specie = await this.speciesService.findSpecie(personData.specie)
+        const specie = await this.speciesService.findSpecie(personData.specie);
+        const starships = await this.starshipsService.getStarshipsByIds(personData.starships);
+        const vehicles = await this.vehiclesService.getVehiclesByIds(personData.vehicles);
+
 
         if (!homeworld)
             throw new NotFoundException(`Homeword #${personData.homeworld} not found`);
 
 
         const person = this.peopleRepository.create({
-            name: personData.name,
-            birth_year: personData.birth_year,
-            eye_color: personData.eye_color,
-            gender: personData.gender,
-            hair_color: personData.hair_color,
-            height: personData.height,
-            mass: personData.mass,
-            skin_color: personData.skin_color,
+            ...personData,
             homeworld: Promise.resolve(homeworld),
             specie: Promise.resolve(specie),
-            images: Promise.resolve(images)
+            images: Promise.resolve(images),
+            starships: Promise.resolve(starships),
+            vehicles: Promise.resolve(vehicles)
         });
 
         const createdPerson = await this.peopleRepository.save(person);
@@ -57,12 +59,14 @@ export class PeopleService {
         return createdPerson;
     }
 
-    public findPeople(skip: number, take: number) {
-        return this.peopleRepository.find({
+    public async findPeople(skip: number, take: number) {
+        const people = await this.peopleRepository.find({
             skip: skip,
             take: take,
-            relations: ['images', 'homeworld']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles']
         });
+
+        return people;
     }
 
     public findPerson(id: number) {
@@ -70,37 +74,67 @@ export class PeopleService {
             where: {
                 id: id
             },
-            relations: ['images', 'homeworld', 'specie']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles']
         });
     }
 
     public async updatePerson(id: number, updatePersonData: UpdatePeopleDto) {
-        const updatedObject = {
-            id: id,
-            ...updatePersonData,
-            homeworld: Promise.resolve(await this.planetsService.getHomeword(updatePersonData.homeworld)),
-            specie: Promise.resolve(await this.speciesService.findSpecie(updatePersonData.specie)),
-        };
 
-        const oldPerson = await this.peopleRepository.findOne({ where: { id: id } });
-        const newPerson = await this.peopleRepository.preload(updatedObject);
+        const { homeworld, specie, starships, vehicles, ...personRestData } = updatePersonData;
 
-        const oldPersonHomeworld = await oldPerson.homeworld;
-        const newPersonHomeworld = await newPerson.homeworld;
+        const person: Person = await this.peopleRepository.findOne(
+            {
+                where: { id: id },
+                relations: ['homeworld', 'specie', 'starships', 'vehicles']
+            }
+        );
 
-        if (!newPerson)
+        if (!person)
             throw new NotFoundException(`Person #${id} not found`);
 
-        if (oldPersonHomeworld.id !== newPersonHomeworld.id) {
+        Object.assign(person, personRestData);
 
-            const oldPlanet = await this.planetsService.findOnePlanet(oldPersonHomeworld.id);
-            const newPlanet = await this.planetsService.findOnePlanet(newPersonHomeworld.id);
+        if (homeworld) {
+            const homeworldFromDb = await person.homeworld;
 
-            await this.planetsService.removeResident(oldPlanet, oldPerson);
-            await this.planetsService.addNewResident(newPlanet, newPerson);
+            if (homeworldFromDb) {
+                const personHomeworldId = homeworldFromDb.id
+
+                if (homeworld != personHomeworldId)
+                    person.homeworld = this.planetsService.findOnePlanet(homeworld);
+            } else {
+                person.homeworld = this.planetsService.findOnePlanet(homeworld);
+            }
         }
 
-        return await this.peopleRepository.save(newPerson);
+        if (specie) {
+            const specieFromDb = await person.specie;
+
+            if (specieFromDb) {
+                const specieHomeworldId = specieFromDb.id
+
+                if (specie != specieHomeworldId)
+                    person.specie = this.speciesService.findSpecie(specie);
+            } else {
+                person.specie = this.speciesService.findSpecie(specie);
+            }
+        }
+
+        if (starships) {
+            const personStarships = (await person.starships).map(starship => starship.id);
+            if (!this.compareArrays(starships, personStarships)) {
+                person.starships = this.starshipsService.getStarshipsByIds(starships)
+            }
+        }
+
+        if (vehicles) {
+            const personVehicles = (await person.vehicles).map(vehicle => vehicle.id);
+            if (!this.compareArrays(vehicles, personVehicles)) {
+                person.vehicles = this.vehiclesService.getVehiclesByIds(vehicles)
+            }
+        }
+
+        return await this.peopleRepository.save(person)
     }
 
     public async deletePerson(id: number) {
@@ -109,15 +143,7 @@ export class PeopleService {
         if (!person)
             throw new NotFoundException(`Person #${id} not found`);
 
-        // const planetId = person.homeworld.id;
-
-        const removedPerson = await this.peopleRepository.remove(person);
-
-        // const planet = await this.planetRepository.findOne({ where: { id: planetId } });
-        // planet.residents = planet.residents.filter(p => p !== person);
-        // await this.planetRepository.save(planet);
-
-        return removedPerson;
+        return await this.peopleRepository.remove(person);
     }
 
     public async getPeopleByIds(ids: number[]) {
@@ -128,5 +154,20 @@ export class PeopleService {
             throw new NotFoundException(`People not found`);
         }
         return people;
+    }
+
+    private compareArrays<T>(arr1: T[], arr2: T[]) {
+        if (arr1.length !== arr2.length)
+            return false;
+
+        const sortedArr1 = arr1.slice().sort();
+        const sortedArr2 = arr2.slice().sort();
+
+        for (let i = 0; i < sortedArr1.length; i++) {
+            if (sortedArr1[i] !== sortedArr2[i])
+                return false;
+        }
+
+        return true;
     }
 }
