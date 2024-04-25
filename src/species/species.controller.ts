@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query,
 import { SpeciesService } from "./species.service";
 import { PaginationType } from "src/people/people.pagination";
 import { ImageFileValidationPipe } from "src/files.validators";
-import { SpeciesInterceptor } from "src/images/images.interceptor";
+import { SpeciesImageStorageInterceptor } from "src/images/images.interceptor";
 import { CreateSpeciesDto, UpdateSpeciesDto } from "./species.dto";
 
 @Controller('species')
@@ -12,7 +12,7 @@ export class SpeciesController {
     ) { }
 
     @Post()
-    @UseInterceptors(SpeciesInterceptor)
+    @UseInterceptors(SpeciesImageStorageInterceptor)
     public async create(
         @Body() specie: CreateSpeciesDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

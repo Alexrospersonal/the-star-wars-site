@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilmsService } from "./films.service";
-import { FilmsInterceptor } from "src/images/images.interceptor";
+import { FilmsImageStorageInterceptor } from "src/images/images.interceptor";
 import { CreateFilmDto, UpdateFilmDto } from "./films.dto";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { PaginationType } from "src/people/people.pagination";
@@ -12,7 +12,7 @@ export class FilmsController {
     ) { }
 
     @Post()
-    @UseInterceptors(FilmsInterceptor)
+    @UseInterceptors(FilmsImageStorageInterceptor)
     public async create(
         @Body() filmsData: CreateFilmDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

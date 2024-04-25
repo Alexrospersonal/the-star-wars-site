@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { StarshipsService } from "./starship.service";
-import { StarshipsInterceptor } from "src/images/images.interceptor";
+import { StarshipsImageStorageInterceptor } from "src/images/images.interceptor";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { CreateStarshipDto, UpdateStarshipDto } from "./starship.dto";
 import { PaginationType } from "src/people/people.pagination";
@@ -13,7 +13,7 @@ export class StarshipsController {
     ) { }
 
     @Post()
-    @UseInterceptors(StarshipsInterceptor)
+    @UseInterceptors(StarshipsImageStorageInterceptor)
     public async create(
         @Body() starshipData: CreateStarshipDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

@@ -3,7 +3,7 @@ import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
 import { ImageFileValidationPipe } from 'src/files.validators';
-import { PeopleInterceptor } from 'src/images/images.interceptor';
+import { PeopleImageStorageInterceptor } from 'src/images/images.interceptor';
 import { ApiProperty } from '@nestjs/swagger';
 import { PersonInterceptor } from './people.interceptos';
 
@@ -14,7 +14,7 @@ export class PeopleController {
     ) { }
 
     @Post()
-    @UseInterceptors(PeopleInterceptor)
+    @UseInterceptors(PeopleImageStorageInterceptor)
     async create(
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

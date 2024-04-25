@@ -52,4 +52,24 @@ export class Planet {
     @JoinTable()
     films: Promise<Films[]>
 
+    async toResponseObject() {
+        return {
+            id: this.id,
+            name: this.name,
+            diameter: this.diameter,
+            rotation_period: this.rotation_period,
+            orbital_period: this.orbital_period,
+            gravity: this.gravity,
+            population: this.population,
+            climate: this.climate,
+            terrain: this.terrain,
+            surface_water: this.surface_water,
+            residents: await this.residents,
+            films: await this.films,
+            images: this.images,
+            created: this.created,
+            edited: this.edited
+        }
+    }
+
 }

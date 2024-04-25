@@ -4,12 +4,12 @@ import { extname } from "path";
 import { IMAGE_BASE_PATH } from "src/settings";
 
 
-export const PlanetInterceptor = createImageInterceptor('planets');
-export const PeopleInterceptor = createImageInterceptor('people');
-export const SpeciesInterceptor = createImageInterceptor('species');
-export const StarshipsInterceptor = createImageInterceptor('starships');
-export const VehiclessInterceptor = createImageInterceptor('vehicles');
-export const FilmsInterceptor = createImageInterceptor('films');
+export const PlanetImageStorageInterceptor = createImageInterceptor('planets');
+export const PeopleImageStorageInterceptor = createImageInterceptor('people');
+export const SpeciesImageStorageInterceptor = createImageInterceptor('species');
+export const StarshipsImageStorageInterceptor = createImageInterceptor('starships');
+export const VehiclessImageStorageInterceptor = createImageInterceptor('vehicles');
+export const FilmsImageStorageInterceptor = createImageInterceptor('films');
 
 function createImageInterceptor(imageFilesDir: string) {
     return FilesInterceptor('files', 10, {

@@ -1,5 +1,5 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from "@nestjs/common";
-import { Observable, from, map, switchMap } from "rxjs";
+import { Observable, from, map, of, switchMap } from "rxjs";
 import { Image } from "src/images/images.entity";
 import { IMAGE_BASE_URL } from "src/settings";
 
@@ -20,16 +20,10 @@ export class FileUrlTransformInterceptor implements NestInterceptor {
                                 } else {
                                     return this.applyFilenameToUrl(data);
                                 }
-                                // if (data && Array.isArray(data.images) && data.images.every(item => item instanceof Image)) {
-                                //     data.images = this.convertFilenametoURL(data.images);
-                                //     return data;
-                                // } else {
-                                //     return data;
-                                // }
                             }
                         ))
                     } else {
-                        return data
+                        return of(this.transformData(data));
                     }
                 })
                 // map(
@@ -43,6 +37,14 @@ export class FileUrlTransformInterceptor implements NestInterceptor {
                 //     }
                 // )
             )
+    }
+
+    private transformData(data: any): any {
+        if (Array.isArray(data)) {
+            return data.map(d => this.applyFilenameToUrl(d));
+        } else {
+            return this.applyFilenameToUrl(data);
+        }
     }
 
     public applyFilenameToUrl<T extends { images: Image[] | string[] }>(data: T) {

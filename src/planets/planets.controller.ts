@@ -3,7 +3,8 @@ import { CreatePlanetDto, UpdatePlanetDto } from "./planets.dto";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { PaginationType } from "src/people/people.pagination";
 import { PlanetsService } from "./planets.service";
-import { PlanetInterceptor } from "src/images/images.interceptor";
+import { PlanetImageStorageInterceptor } from "src/images/images.interceptor";
+import { PlanetInterceptor } from "./planets.interceptor";
 
 @Controller('planets')
 export class PlanetsController {
@@ -12,40 +13,40 @@ export class PlanetsController {
     ) { }
 
     @Post()
-    @UseInterceptors(PlanetInterceptor)
+    @UseInterceptors(PlanetImageStorageInterceptor)
     async create(
         @Body() createPlanet: CreatePlanetDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        // TODO: Call creating function from DB
-        return await this.planetsService.createPlanet(createPlanet, files);
+        return await (await this.planetsService.createPlanet(createPlanet, files)).toResponseObject();
     }
 
     @Get()
-    findAll(@Query() query: PaginationType) {
-        // TODO: Gat first 10 planets from DB, use pagination
+    @UseInterceptors(PlanetInterceptor)
+    async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0;
-        return this.planetsService.findAllPlanet(skip, 10)
+        const planets = await this.planetsService.findAllPlanet(skip, 10);
+        return Promise.all(planets.map(async (planet) => await planet.toResponseObject()))
     }
 
     @Get(':id')
+    @UseInterceptors(PlanetInterceptor)
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        // TODO: Get one planet from DB
-        return await this.planetsService.getOnePlanet(id);
+        return await (await this.planetsService.getOnePlanet(id)).toResponseObject();
     }
 
     @Patch(':id')
+    @UseInterceptors(PlanetInterceptor)
     async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updatePlanet: UpdatePlanetDto
     ) {
-        // TODO: call updating function from DB
-        return await this.planetsService.updatePlanet(id, updatePlanet);
+        return await (await this.planetsService.updatePlanet(id, updatePlanet)).toResponseObject();
     }
 
     @Delete(':id')
+    @UseInterceptors(PlanetInterceptor)
     async delete(@Param('id', ParseIntPipe) id: number) {
-        // TODO: call deleting function from DB
-        return await this.planetsService.deletePlanet(id);
+        return await (await this.planetsService.deletePlanet(id)).toResponseObject();
     }
 }

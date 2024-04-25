@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { VehiclesService } from "./vehicles.service";
-import { VehiclessInterceptor } from "src/images/images.interceptor";
+import { VehiclessImageStorageInterceptor } from "src/images/images.interceptor";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
 import { PaginationType } from "src/people/people.pagination";
@@ -12,7 +12,7 @@ export class vehiclesController {
     ) { }
 
     @Post()
-    @UseInterceptors(VehiclessInterceptor)
+    @UseInterceptors(VehiclessImageStorageInterceptor)
     public async create(
         @Body() vehicleData: CreateVehicleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

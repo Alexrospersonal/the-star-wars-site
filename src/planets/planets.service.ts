@@ -36,7 +36,7 @@ export class PlanetsService {
             climate: planetData.climate,
             terrain: planetData.terrain,
             surface_water: planetData.surface_water,
-            residents: Promise.resolve([]),
+            // residents: Promise.resolve([]),
             images: images
         });
 
@@ -47,7 +47,7 @@ export class PlanetsService {
         const planet = await this.planetRepository.findOne(
             {
                 where: { id: id },
-                relations: ['images', 'residents']
+                relations: ['residents', 'images', 'films']
             }
         );
 
@@ -62,6 +62,7 @@ export class PlanetsService {
         return this.planetRepository.find({
             skip: skip,
             take: take,
+            relations: ['residents', 'images', 'films']
         });
     }
 
@@ -84,13 +85,6 @@ export class PlanetsService {
         if (!planet) {
             throw new NotFoundException(`Planet #${id} not found`);
         }
-
-        // const residents = planet.residents.map(person => {
-        //     person.homeworld = null;
-        //     return person;
-        // });
-
-        // this.peopleRepository.save(residents);
 
         return await this.planetRepository.remove(planet);
     }

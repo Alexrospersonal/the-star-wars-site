@@ -63,7 +63,7 @@ export class PeopleService {
         const people = await this.peopleRepository.find({
             skip: skip,
             take: take,
-            relations: ['homeworld', 'specie', 'starships', 'vehicles']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images']
         });
 
         return people;
@@ -74,7 +74,7 @@ export class PeopleService {
             where: {
                 id: id
             },
-            relations: ['homeworld', 'specie', 'starships', 'vehicles']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images']
         });
     }
 
@@ -85,7 +85,7 @@ export class PeopleService {
         const person: Person = await this.peopleRepository.findOne(
             {
                 where: { id: id },
-                relations: ['homeworld', 'specie', 'starships', 'vehicles']
+                relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images']
             }
         );
 

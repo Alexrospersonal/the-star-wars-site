@@ -94,7 +94,6 @@ export class Person {
             homeworld: await this.homeworld,
             created: this.created,
             edited: this.edited,
-
         }
     }
 }
