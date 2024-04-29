@@ -74,9 +74,9 @@ export class Starships {
     @OneToMany(() => Image, (image) => image.starship)
     images: Image[]
 
-    @ManyToMany(() => Films, (films) => films.starships, { lazy: true })
+    @ManyToMany(() => Films, (films) => films.starships)
     @JoinTable()
-    films: Promise<Films[]>
+    films: Films[]
 
     async toResponseObject() {
         return {
@@ -94,7 +94,7 @@ export class Starships {
             model: this.model,
             passengers: this.passengers,
             pilots: await this.pilots,
-            films: await this.films,
+            films: this.films,
             created: this.created,
             edited: this.edited,
             images: this.images

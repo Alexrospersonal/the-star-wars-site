@@ -18,9 +18,9 @@ export class Films {
     director: string;
 
     @Column()
-    episode_id: string;
+    episode_id: number;
 
-    @Column()
+    @Column({ type: "text" })
     opening_crawl: string;
 
     @Column()
@@ -29,25 +29,25 @@ export class Films {
     @Column()
     release_date: string;
 
-    @ManyToMany(() => Person, (person) => person.films, { lazy: true })
+    @ManyToMany(() => Person, (person) => person.films)
     @JoinTable()
-    characters: Promise<Person[]>
+    characters: Person[]
 
-    @ManyToMany(() => Planet, (planets) => planets.films, { lazy: true })
+    @ManyToMany(() => Planet, (planets) => planets.films)
     @JoinTable()
-    planets: Promise<Planet[]>
+    planets: Planet[]
 
-    @ManyToMany(() => Species, (species) => species.films, { lazy: true })
+    @ManyToMany(() => Species, (species) => species.films)
     @JoinTable()
-    species: Promise<Species[]>
+    species: Species[]
 
-    @ManyToMany(() => Starships, (starships) => starships.films, { lazy: true })
+    @ManyToMany(() => Starships, (starships) => starships.films)
     @JoinTable()
-    starships: Promise<Starships[]>
+    starships: Starships[]
 
-    @ManyToMany(() => Vehicles, (vehicles) => vehicles.films, { lazy: true })
+    @ManyToMany(() => Vehicles, (vehicles) => vehicles.films)
     @JoinTable()
-    vehicles: Promise<Vehicles[]>
+    vehicles: Vehicles[]
 
     @CreateDateColumn()
     created: Date;
@@ -57,4 +57,26 @@ export class Films {
 
     @OneToMany(() => Image, (image) => image.film)
     images: Image[]
+
+    async toResponseObject() {
+        return {
+            id: this.id,
+            title: this.title,
+            director: this.director,
+            episode_id: this.episode_id,
+            opening_crawl: this.opening_crawl,
+            producer: this.producer,
+            release_date: this.release_date,
+
+            characters: await this.characters,
+            planets: await this.planets,
+            species: await this.starships,
+            starships: await this.starships,
+            vehicles: await this.vehicles,
+
+            created: this.created,
+            edited: this.edited,
+            images: this.images
+        }
+    }
 }

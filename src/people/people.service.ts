@@ -9,11 +9,13 @@ import { PlanetsService } from 'src/planets/planets.service';
 import { SpeciesService } from 'src/species/species.service';
 import { VehiclesService } from 'src/vehicles/vehicles.service';
 import { StarshipsService } from 'src/starships/starship.service';
+import { Films } from 'src/films/films.entity';
+import { FilmContainer } from 'src/films/films.interface';
 
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
-export class PeopleService {
+export class PeopleService implements FilmContainer<Person> {
     constructor(
         @InjectRepository(Person)
         private peopleRepository: Repository<Person>,
@@ -33,7 +35,6 @@ export class PeopleService {
     public async createPerson(personData: CreatePeopleDto, files: Array<Express.Multer.File>) {
         const images = await this.imagesService.saveImages(files);
 
-        // const homeworld = await this.planetsService.getHomeword(personData.homeworld);
         const homeworld = await this.planetsService.getOnePlanet(personData.homeworld);
         const specie = await this.speciesService.findSpecie(personData.specie);
         const starships = await this.starshipsService.getStarshipsByIds(personData.starships);
@@ -66,7 +67,7 @@ export class PeopleService {
         const people = await this.peopleRepository.find({
             skip: skip,
             take: take,
-            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images', 'films']
         });
 
         return people;
@@ -77,7 +78,7 @@ export class PeopleService {
             where: {
                 id: id
             },
-            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images']
+            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images', 'films']
         });
     }
 
@@ -150,8 +151,11 @@ export class PeopleService {
     }
 
     public async getPeopleByIds(ids: number[]) {
-        const people = await this.peopleRepository.findBy({
-            id: In(ids)
+        const people = await this.peopleRepository.find({
+            where: {
+                id: In(ids),
+            },
+            relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images', 'films']
         })
         if (!people) {
             throw new NotFoundException(`People not found`);
@@ -173,4 +177,13 @@ export class PeopleService {
 
         return true;
     }
+
+    public async addNewFilmToEntity(entity: Person, film: Films) {
+        const films = entity.films;
+        films.push(film);
+
+        entity.films = films;
+        return await this.peopleRepository.save(entity);
+    }
+
 }

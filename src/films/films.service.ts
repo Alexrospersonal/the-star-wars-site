@@ -10,6 +10,12 @@ import { SpeciesService } from "src/species/species.service";
 import { StarshipsService } from "src/starships/starship.service";
 import { VehiclesService } from "src/vehicles/vehicles.service";
 import { CreateFilmDto, UpdateFilmDto } from "./films.dto";
+import { Person } from "src/people/entities/people.entity";
+import { FilmContainer } from "./films.interface";
+import { Planet } from "src/planets/planets.entity";
+import { Species } from "src/species/species.entity";
+import { Starships } from "src/starships/starship.entity";
+import { Vehicles } from "src/vehicles/vehicles.entity";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
@@ -24,9 +30,7 @@ export class FilmsService {
         private readonly speciesService: SpeciesService,
         private readonly starshipsService: StarshipsService,
         private readonly vehiclesService: VehiclesService,
-    ) {
-
-    }
+    ) { }
 
     async createFilm(filmsData: CreateFilmDto, files: Express.Multer.File[]) {
         const images = await this.imagesService.saveImages(files);
@@ -37,18 +41,31 @@ export class FilmsService {
         const starships = await this.starshipsService.getStarshipsByIds(filmsData.starships);
         const vehicles = await this.vehiclesService.getVehiclesByIds(filmsData.vehicles);
 
-
         const film = this.filmsRepository.create({
             ...filmsData,
-            characters: Promise.resolve(characters),
-            planets: Promise.resolve(planets),
-            species: Promise.resolve(species),
-            starships: Promise.resolve(starships),
-            vehicles: Promise.resolve(vehicles),
+            characters: characters,
+            planets: planets,
+            species: species,
+            starships: starships,
+            vehicles: vehicles,
             images: images
         });
 
-        return await this.filmsRepository.save(film);
+        const createdFilm = await this.filmsRepository.save(film);
+
+        await this.addFilmToEntyties<Person, PeopleService>(characters, createdFilm, this.peopleService);
+        await this.addFilmToEntyties<Planet, PlanetsService>(planets, createdFilm, this.planetsService);
+        await this.addFilmToEntyties<Species, SpeciesService>(species, createdFilm, this.speciesService);
+        await this.addFilmToEntyties<Starships, StarshipsService>(starships, createdFilm, this.starshipsService);
+        await this.addFilmToEntyties<Vehicles, VehiclesService>(vehicles, createdFilm, this.vehiclesService);
+
+        return createdFilm;
+    }
+
+    async addFilmToEntyties<T, U extends FilmContainer<T>>(entities: T[], film: Films, repository: U) {
+        for (const entity of entities) {
+            await repository.addNewFilmToEntity(entity, film)
+        }
     }
 
     findFilm(id: number) {
@@ -77,11 +94,11 @@ export class FilmsService {
 
         const filmData = {
             ...UpdateFilmDto,
-            characters: Promise.resolve(characters),
-            planets: Promise.resolve(planets),
-            species: Promise.resolve(species),
-            starships: Promise.resolve(starships),
-            vehicles: Promise.resolve(vehicles),
+            characters: characters,
+            planets: planets,
+            species: species,
+            starships: starships,
+            vehicles: vehicles,
         }
 
         const updatedFilm = await this.filmsRepository.preload(filmData)

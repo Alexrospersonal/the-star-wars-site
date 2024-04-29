@@ -5,10 +5,12 @@ import { Vehicles } from "./vehicles.entity";
 import { In, Repository } from "typeorm";
 import { ImagesService } from "src/images/images.service";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
+import { Films } from "src/films/films.entity";
+import { FilmContainer } from "src/films/films.interface";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
-export class VehiclesService {
+export class VehiclesService implements FilmContainer<Vehicles> {
 
     constructor(
         @InjectRepository(Vehicles)
@@ -32,7 +34,7 @@ export class VehiclesService {
             where: {
                 id: id
             },
-            relations: ['images', 'pilots']
+            relations: ['images', 'pilots', 'films']
         });
     }
 
@@ -40,7 +42,7 @@ export class VehiclesService {
         return this.vehiclesRepository.find({
             skip: skip,
             take: take,
-            relations: ['images', 'pilots']
+            relations: ['images', 'pilots', 'films']
         });
     }
 
@@ -69,12 +71,23 @@ export class VehiclesService {
     }
 
     public async getVehiclesByIds(ids: number[]) {
-        const vehicles = await this.vehiclesRepository.findBy({
-            id: In(ids)
+        const vehicles = await this.vehiclesRepository.find({
+            where: {
+                id: In(ids)
+            },
+            relations: ['images', 'pilots', 'films']
         })
         if (!vehicles) {
             throw new NotFoundException(`People not found`);
         }
         return vehicles;
+    }
+
+    public async addNewFilmToEntity(entity: Vehicles, film: Films) {
+        const films = entity.films;
+        films.push(film);
+
+        entity.films = films;
+        return await this.vehiclesRepository.save(entity);
     }
 }

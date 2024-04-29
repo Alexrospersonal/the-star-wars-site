@@ -8,10 +8,12 @@ import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "src/planets/planets.entity";
+import { Films } from "src/films/films.entity";
+import { FilmContainer } from "src/films/films.interface";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
-export class SpeciesService {
+export class SpeciesService implements FilmContainer<Species> {
     constructor(
         @InjectRepository(Species)
         private readonly speciesRepository: Repository<Species>,
@@ -53,7 +55,7 @@ export class SpeciesService {
             where: {
                 id: id
             },
-            relations: ['images', 'homeworld', 'people']
+            relations: ['images', 'homeworld', 'people', 'films']
         })
     }
 
@@ -61,7 +63,7 @@ export class SpeciesService {
         return this.speciesRepository.find({
             skip: skip,
             take: take,
-            relations: ['images', 'homeworld', 'people']
+            relations: ['images', 'homeworld', 'people', 'films']
         });
     }
 
@@ -92,8 +94,11 @@ export class SpeciesService {
     }
 
     public async getSpesiesByIds(ids: number[]) {
-        const specie = await this.speciesRepository.findBy({
-            id: In(ids)
+        const specie = await this.speciesRepository.find({
+            where: {
+                id: In(ids)
+            },
+            relations: ['images', 'homeworld', 'people', 'films']
         })
         if (!specie) {
             throw new NotFoundException(`People not found`);
@@ -107,5 +112,13 @@ export class SpeciesService {
 
         specie.people = Promise.resolve(residents);
         return await this.speciesRepository.save(specie);
+    }
+
+    public async addNewFilmToEntity(entity: Species, film: Films) {
+        const films = entity.films;
+        films.push(film);
+
+        entity.films = films;
+        return await this.speciesRepository.save(entity);
     }
 }

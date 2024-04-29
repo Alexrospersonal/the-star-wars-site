@@ -71,9 +71,9 @@ export class Person {
     @ManyToOne(() => Species, (specie) => specie.people, { lazy: true })
     specie: Promise<Species>
 
-    @ManyToMany(() => Films, (films) => films.characters, { lazy: true })
+    @ManyToMany(() => Films, (films) => films.characters)
     @JoinTable()
-    films: Promise<Films[]>
+    films: Films[]
 
     async toResponseObject() {
         return {

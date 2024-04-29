@@ -7,11 +7,13 @@ import { Planet } from "./planets.entity";
 import { In, Repository } from "typeorm";
 import { Person } from "src/people/entities/people.entity";
 import { Species } from "src/species/species.entity";
+import { Films } from "src/films/films.entity";
+import { FilmContainer } from "src/films/films.interface";
 
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
-export class PlanetsService {
+export class PlanetsService implements FilmContainer<Planet> {
     constructor(
         private readonly imagesService: ImagesService,
         @InjectRepository(Planet)
@@ -126,12 +128,24 @@ export class PlanetsService {
     // }
 
     public async getPlanetByIds(ids: number[]) {
-        const people = await this.planetRepository.findBy({
-            id: In(ids)
+        const people = await this.planetRepository.find({
+            where: {
+                id: In(ids)
+            },
+            relations: ['residents', 'images', 'films']
         })
         if (!people) {
             throw new NotFoundException(`People not found`);
         }
         return people;
     }
+
+    public async addNewFilmToEntity(entity: Planet, film: Films) {
+        const films = entity.films;
+        films.push(film);
+
+        entity.films = films;
+        return await this.planetRepository.save(entity);
+    }
+
 }

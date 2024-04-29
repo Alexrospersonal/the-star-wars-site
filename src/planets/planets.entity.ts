@@ -51,9 +51,9 @@ export class Planet {
     @OneToMany(() => Image, (image) => image.planet)
     images: Image[]
 
-    @ManyToMany(() => Films, (films) => films.planets, { lazy: true })
+    @ManyToMany(() => Films, (films) => films.planets)
     @JoinTable()
-    films: Promise<Films[]>
+    films: Films[]
 
     async toResponseObject() {
         return {
@@ -68,7 +68,7 @@ export class Planet {
             terrain: this.terrain,
             surface_water: this.surface_water,
             residents: await this.residents,
-            films: await this.films,
+            films: this.films,
             images: this.images,
             created: this.created,
             edited: this.edited

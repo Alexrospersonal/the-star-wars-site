@@ -12,8 +12,8 @@ export class CreateFilmDto {
     director: string;
 
     @ApiProperty()
-    @IsString()
-    episode_id: string;
+    @IsNumber()
+    episode_id: number;
 
     @ApiProperty()
     @IsString()
@@ -28,23 +28,23 @@ export class CreateFilmDto {
     release_date: string;
 
     @IsArray()
-    @IsNumber({}, { each: true })
+    // @IsNumber({}, { each: true })
     characters: number[]
 
     @IsArray()
-    @IsNumber({}, { each: true })
+    // @IsNumber({}, { each: true })
     planets: number[]
 
     @IsArray()
-    @IsNumber({}, { each: true })
+    // @IsNumber({}, { each: true })
     species: number[]
 
     @IsArray()
-    @IsNumber({}, { each: true })
+    // @IsNumber({}, { each: true })
     starships: number[]
 
     @IsArray()
-    @IsNumber({}, { each: true })
+    // @IsNumber({}, { each: true })
     vehicles: number[]
 
 }

@@ -6,10 +6,12 @@ import { ImagesService } from "src/images/images.service";
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { PeopleService } from "src/people/people.service";
 import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { FilmContainer } from "src/films/films.interface";
+import { Films } from "src/films/films.entity";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
-export class StarshipsService {
+export class StarshipsService implements FilmContainer<Starships> {
 
     constructor(
         @InjectRepository(Starships)
@@ -71,12 +73,23 @@ export class StarshipsService {
     }
 
     public async getStarshipsByIds(ids: number[]) {
-        const starships = await this.starshipRepository.findBy({
-            id: In(ids)
+        const starships = await this.starshipRepository.find({
+            where: {
+                id: In(ids)
+            },
+            relations: ['images', 'pilots', 'films']
         })
         if (!starships) {
             throw new NotFoundException(`People not found`);
         }
         return starships;
+    }
+
+    public async addNewFilmToEntity(entity: Starships, film: Films) {
+        const films = entity.films;
+        films.push(film);
+
+        entity.films = films;
+        return await this.starshipRepository.save(entity);
     }
 }
