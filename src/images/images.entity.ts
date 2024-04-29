@@ -2,6 +2,7 @@ import { Films } from "src/films/films.entity";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "src/planets/planets.entity";
 import { Species } from "src/species/species.entity";
+import { Starships } from "src/starships/starship.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -17,14 +18,14 @@ export class Image {
     person: Person
 
     @ManyToOne(() => Planet, (planet) => planet.images)
-    planet: Person
+    planet: Planet
 
-    @ManyToOne(() => Planet, (specie) => specie.images)
+    @ManyToOne(() => Species, (specie) => specie.images)
     specie: Species
 
-    @ManyToOne(() => Planet, (starship) => starship.images)
-    starship: Species
+    @ManyToOne(() => Starships, (starship) => starship.images)
+    starship: Starships
 
     @ManyToOne(() => Films, (film) => film.images)
-    film: Species
+    film: Films
 }

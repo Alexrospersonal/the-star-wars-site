@@ -14,6 +14,7 @@ export class PlanetsController {
 
     @Post()
     @UseInterceptors(PlanetImageStorageInterceptor)
+    @UseInterceptors(PlanetInterceptor)
     async create(
         @Body() createPlanet: CreatePlanetDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>

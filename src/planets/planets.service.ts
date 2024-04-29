@@ -6,6 +6,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Planet } from "./planets.entity";
 import { In, Repository } from "typeorm";
 import { Person } from "src/people/entities/people.entity";
+import { Species } from "src/species/species.entity";
 
 
 @Injectable()
@@ -89,32 +90,40 @@ export class PlanetsService {
         return await this.planetRepository.remove(planet);
     }
 
-    public async getHomeword(id: number) {
-        return await this.planetRepository.findOne({
-            where: {
-                id: id
-            },
-            relations: ['residents']
-        });
-    }
+    // public async getHomeword(id: number) {
+    //     return await this.planetRepository.findOne({
+    //         where: {
+    //             id: id
+    //         },
+    //         relations: ['residents']
+    //     });
+    // }
 
     public async addNewResident(planet: Planet, resident: Person) {
         const residents = await planet.residents;
         residents.push(resident);
 
         planet.residents = Promise.resolve(residents);
-        await this.planetRepository.save(planet);
+        return await this.planetRepository.save(planet);
     }
 
-    public async removeResident(planet: Planet, resident: Person) {
-        const residents = await planet.residents;
-        planet.residents = Promise.resolve(
-            residents.filter((person, idx, arr) => {
-                person !== resident
-            })
-        )
-        await this.planetRepository.save(planet);
+    public async addNewSpecie(homeworld: Planet, specie: Species) {
+        const species = await homeworld.species;
+        species.push(specie);
+
+        homeworld.species = Promise.resolve(species);
+        return await this.planetRepository.save(homeworld);
     }
+
+    // public async removeResident(planet: Planet, resident: Person) {
+    //     const residents = await planet.residents;
+    //     planet.residents = Promise.resolve(
+    //         residents.filter((person, idx, arr) => {
+    //             person !== resident
+    //         })
+    //     )
+    //     await this.planetRepository.save(planet);
+    // }
 
     public async getPlanetByIds(ids: number[]) {
         const people = await this.planetRepository.findBy({

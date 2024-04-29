@@ -33,7 +33,8 @@ export class PeopleService {
     public async createPerson(personData: CreatePeopleDto, files: Array<Express.Multer.File>) {
         const images = await this.imagesService.saveImages(files);
 
-        const homeworld = await this.planetsService.getHomeword(personData.homeworld);
+        // const homeworld = await this.planetsService.getHomeword(personData.homeworld);
+        const homeworld = await this.planetsService.getOnePlanet(personData.homeworld);
         const specie = await this.speciesService.findSpecie(personData.specie);
         const starships = await this.starshipsService.getStarshipsByIds(personData.starships);
         const vehicles = await this.vehiclesService.getVehiclesByIds(personData.vehicles);
@@ -55,6 +56,8 @@ export class PeopleService {
         const createdPerson = await this.peopleRepository.save(person);
 
         await this.planetsService.addNewResident(homeworld, createdPerson);
+
+        await this.speciesService.addNewPerson(specie, createdPerson);
 
         return createdPerson;
     }

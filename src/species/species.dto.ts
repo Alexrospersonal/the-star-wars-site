@@ -46,12 +46,4 @@ export class CreateSpeciesDto {
 }
 
 
-// @IsArray()
-// @IsNumber({}, { each: true })
-// films: number[];
-
-// @IsArray()
-// @IsNumber({}, { each: true })
-// people: number[];
-
 export class UpdateSpeciesDto extends PartialType(CreateSpeciesDto) { }

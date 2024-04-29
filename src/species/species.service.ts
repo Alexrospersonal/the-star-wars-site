@@ -6,11 +6,12 @@ import { ImagesService } from "src/images/images.service";
 import { PlanetsService } from "src/planets/planets.service";
 import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
 import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
+import { Person } from "src/people/entities/people.entity";
+import { Planet } from "src/planets/planets.entity";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
 export class SpeciesService {
-
     constructor(
         @InjectRepository(Species)
         private readonly speciesRepository: Repository<Species>,
@@ -22,10 +23,13 @@ export class SpeciesService {
 
     async createSpecie(specieData: CreateSpeciesDto, files: Express.Multer.File[]) {
         const images = await this.imagesService.saveImages(files);
-        const homeworld = await this.planetsService.findOnePlanet(specieData.homeworld);
 
-        if (!homeworld)
-            throw new NotFoundException(`Homeword #${specieData.homeworld} not found`);
+        let homeworld: Planet;
+
+        if (specieData.homeworld > 0)
+            homeworld = await this.planetsService.findOnePlanet(specieData.homeworld);
+        else
+            homeworld = null
 
         const specie = this.speciesRepository.create({
             ...specieData,
@@ -33,8 +37,15 @@ export class SpeciesService {
             images: images
         });
 
-        return await this.speciesRepository.save(specie);
 
+        const newSpecie = await this.speciesRepository.save(specie);
+
+
+        if (homeworld) {
+            await this.planetsService.addNewSpecie(homeworld, newSpecie);
+        }
+
+        return newSpecie
     }
 
     findSpecie(id: number) {
@@ -56,7 +67,8 @@ export class SpeciesService {
 
     async updateSpecie(id: number, updateSpecieData: UpdateSpeciesDto) {
 
-        const homeworld = await this.planetsService.getHomeword(updateSpecieData.homeworld);
+        // const homeworld = await this.planetsService.getHomeword(updateSpecieData.homeworld);
+        const homeworld = await this.planetsService.getOnePlanet(updateSpecieData.homeworld);
 
         const updateSpecie = {
             id: id,
@@ -89,4 +101,11 @@ export class SpeciesService {
         return specie;
     }
 
+    async addNewPerson(specie: Species, person: Person) {
+        const residents = await specie.people;
+        residents.push(person);
+
+        specie.people = Promise.resolve(residents);
+        return await this.speciesRepository.save(specie);
+    }
 }

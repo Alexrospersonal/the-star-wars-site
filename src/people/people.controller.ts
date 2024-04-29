@@ -15,11 +15,14 @@ export class PeopleController {
 
     @Post()
     @UseInterceptors(PeopleImageStorageInterceptor)
+    @UseInterceptors(PersonInterceptor)
     async create(
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        return (await this.peopleService.createPerson(createPeople, files)).toResponseObject();
+        const person = await this.peopleService.createPerson(createPeople, files);
+        return await (await this.peopleService.findOne(person.id)).toResponseObject()
+
     }
 
     @Get()

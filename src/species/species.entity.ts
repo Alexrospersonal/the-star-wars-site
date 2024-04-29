@@ -41,7 +41,7 @@ export class Species {
     @OneToMany(() => Person, (person) => person.specie, { lazy: true })
     people: Promise<Person[]>
 
-    @ManyToOne(() => Planet, { lazy: true })
+    @ManyToOne(() => Planet, (homeworld) => homeworld.species, { lazy: true })
     homeworld: Promise<Planet>;
 
     @CreateDateColumn()
@@ -58,11 +58,6 @@ export class Species {
     films: Promise<Films[]>
 
     async toResponseObject() {
-        const homeworld = await this.homeworld;
-        const people = await this.people;
-
-        const peopleUrl = people.map(person => `${BASE_URL}people/${person.id}`);
-
         return {
             id: this.id,
             name: this.name,
@@ -74,8 +69,8 @@ export class Species {
             hair_colors: this.hair_colors,
             language: this.language,
             skin_colors: this.skin_colors,
-            people: peopleUrl,
-            homeworld: `${BASE_URL}planets/${homeworld.id}`,
+            people: await this.people,
+            homeworld: await this.homeworld,
             created: this.created,
             edited: this.edited,
             images: this.images

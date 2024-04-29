@@ -45,6 +45,9 @@ export class Planet {
     @UpdateDateColumn()
     edited: Date;
 
+    @OneToMany(() => Species, (specie) => specie.homeworld, { lazy: true })
+    species: Promise<Species[]>
+
     @OneToMany(() => Image, (image) => image.planet)
     images: Image[]
 
