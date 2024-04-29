@@ -17,6 +17,7 @@ export class StarshipsService {
         private readonly imagesService: ImagesService,
     ) { }
 
+
     async createStarship(starshipData: CreateStarshipDto, files: Express.Multer.File[]) {
         const images = await this.imagesService.saveImages(files);
 
@@ -33,7 +34,7 @@ export class StarshipsService {
             where: {
                 id: id
             },
-            relations: ['images', 'pilots']
+            relations: ['images', 'pilots', 'films']
         });
     }
 
@@ -41,7 +42,7 @@ export class StarshipsService {
         return this.starshipRepository.find({
             skip: skip,
             take: take,
-            relations: ['images', 'pilots']
+            relations: ['images', 'pilots', 'films']
         });
     }
 

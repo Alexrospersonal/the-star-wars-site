@@ -51,7 +51,9 @@ export class Vehicles {
     @IsString()
     passengers: string;
 
-    // films: Film[]
+    @Column()
+    @IsString()
+    vehicle_class: string;
 
     @ManyToMany(() => Person, (person) => person.vehicles, { lazy: true })
     @JoinTable()
@@ -71,10 +73,6 @@ export class Vehicles {
     films: Promise<Films[]>
 
     async toResponseObject() {
-        const pilots = await this.pilots;
-
-        const pilotsUrl = pilots.map(pilot => `${BASE_URL}people/${pilot.id}`);
-
         return {
             id: this.id,
             name: this.name,
@@ -87,7 +85,9 @@ export class Vehicles {
             max_atmosphering_speed: this.max_atmosphering_speed,
             model: this.model,
             passengers: this.passengers,
-            pilots: pilotsUrl,
+            vehicle_class: this.vehicle_class,
+            pilots: await this.pilots,
+            films: await this.films,
             created: this.created,
             edited: this.edited,
             images: this.images

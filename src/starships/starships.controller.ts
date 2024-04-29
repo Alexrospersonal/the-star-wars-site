@@ -4,6 +4,7 @@ import { StarshipsImageStorageInterceptor } from "src/images/images.interceptor"
 import { ImageFileValidationPipe } from "src/files.validators";
 import { CreateStarshipDto, UpdateStarshipDto } from "./starship.dto";
 import { PaginationType } from "src/people/people.pagination";
+import { StarshipsInterceptor } from "./starship.interceptor";
 
 
 @Controller('starships')
@@ -14,6 +15,7 @@ export class StarshipsController {
 
     @Post()
     @UseInterceptors(StarshipsImageStorageInterceptor)
+    @UseInterceptors(StarshipsInterceptor)
     public async create(
         @Body() starshipData: CreateStarshipDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
@@ -23,18 +25,22 @@ export class StarshipsController {
     }
 
     @Get(':id')
+    @UseInterceptors(StarshipsInterceptor)
     public async findOne(@Param('id', ParseIntPipe) id: number) {
         const starship = await this.starshipsService.findStarship(id);
         return await starship.toResponseObject()
     }
 
     @Get()
+    @UseInterceptors(StarshipsInterceptor)
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        return await this.starshipsService.findStarships(skip, 10);
+        const starships = await this.starshipsService.findStarships(skip, 10);
+        return Promise.all(starships.map(async starship => await starship.toResponseObject()))
     }
 
     @Patch(':id')
+    @UseInterceptors(StarshipsInterceptor)
     public async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateStarship: UpdateStarshipDto
@@ -44,6 +50,7 @@ export class StarshipsController {
     }
 
     @Delete(':id')
+    @UseInterceptors(StarshipsInterceptor)
     public async delete(@Param('id', ParseIntPipe) id: number) {
         const starship = await this.starshipsService.deleteStarship(id);
         return await starship.toResponseObject()

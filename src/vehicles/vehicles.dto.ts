@@ -41,7 +41,10 @@ export class CreateVehicleDto {
     @ApiProperty()
     @IsString()
     passengers: string;
-    // films: number[]
+
+    @ApiProperty()
+    @IsString()
+    vehicle_class: string;
 
 }
 
