@@ -49,9 +49,9 @@ export class PeopleService implements FilmContainer<Person> {
             ...personData,
             homeworld: Promise.resolve(homeworld),
             specie: Promise.resolve(specie),
-            images: Promise.resolve(images),
-            starships: Promise.resolve(starships),
-            vehicles: Promise.resolve(vehicles)
+            images: images,
+            starships: starships,
+            vehicles: vehicles
         });
 
         const createdPerson = await this.peopleRepository.save(person);
@@ -59,6 +59,10 @@ export class PeopleService implements FilmContainer<Person> {
         await this.planetsService.addNewResident(homeworld, createdPerson);
 
         await this.speciesService.addNewPerson(specie, createdPerson);
+
+        await this.vehiclesService.addNewPilots(createdPerson, vehicles);
+
+        await this.starshipsService.addNewPilots(createdPerson, starships);
 
         return createdPerson;
     }
@@ -125,16 +129,16 @@ export class PeopleService implements FilmContainer<Person> {
         }
 
         if (starships) {
-            const personStarships = (await person.starships).map(starship => starship.id);
+            const personStarships = (person.starships).map(starship => starship.id);
             if (!this.compareArrays(starships, personStarships)) {
-                person.starships = this.starshipsService.getStarshipsByIds(starships)
+                person.starships = await this.starshipsService.getStarshipsByIds(starships)
             }
         }
 
         if (vehicles) {
-            const personVehicles = (await person.vehicles).map(vehicle => vehicle.id);
+            const personVehicles = (person.vehicles).map(vehicle => vehicle.id);
             if (!this.compareArrays(vehicles, personVehicles)) {
-                person.vehicles = this.vehiclesService.getVehiclesByIds(vehicles)
+                person.vehicles = await this.vehiclesService.getVehiclesByIds(vehicles)
             }
         }
 
@@ -142,7 +146,11 @@ export class PeopleService implements FilmContainer<Person> {
     }
 
     public async deletePerson(id: number) {
-        const person = await this.peopleRepository.findOne({ where: { id: id } });
+        const person = await this.findPerson(id)
+
+        for (const image of person.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         if (!person)
             throw new NotFoundException(`Person #${id} not found`);

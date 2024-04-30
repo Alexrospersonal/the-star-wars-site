@@ -4,43 +4,63 @@ import { IsArray, IsNumber, IsString } from "class-validator";
 
 export class CreateSpeciesDto {
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The average height of this species in centimeters.'
+    })
     @IsString()
     average_height: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The average lifespan of this species in years.'
+    })
     @IsString()
     average_lifespan: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The classification of this species, such as "mammal" or "reptile".'
+    })
     @IsString()
     classification: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The designation of this species, such as "sentient".'
+    })
     @IsString()
     designation: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'A comma-separated string of common eye colors for this species, "none" if this species does not typically have eyes.'
+    })
     @IsString()
     eye_colors: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'A comma-separated string of common hair colors for this species, "none" if this species does not typically have hair.'
+    })
     @IsString()
     hair_colors: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The ID of a planet resource, a planet that this species originates from.'
+    })
     @IsNumber()
     homeworld: number;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The language commonly spoken by this species.'
+    })
     @IsString()
     language: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'The name of this species.'
+    })
     @IsString()
     name: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        description: 'A comma-separated string of common skin colors for this species, "none" if this species does not typically have skin.'
+    })
     @IsString()
     skin_colors: string;
 }

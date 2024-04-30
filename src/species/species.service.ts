@@ -68,8 +68,6 @@ export class SpeciesService implements FilmContainer<Species> {
     }
 
     async updateSpecie(id: number, updateSpecieData: UpdateSpeciesDto) {
-
-        // const homeworld = await this.planetsService.getHomeword(updateSpecieData.homeworld);
         const homeworld = await this.planetsService.getOnePlanet(updateSpecieData.homeworld);
 
         const updateSpecie = {
@@ -85,10 +83,14 @@ export class SpeciesService implements FilmContainer<Species> {
     }
 
     async deleteSpecie(id: number) {
-        const specie = await this.speciesRepository.findOne({ where: { id: id } });
+        const specie = await this.findSpecie(id);
 
         if (!specie)
             throw new NotFoundException(`Specie #${id} not found`);
+
+        for (const image of specie.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         return await this.speciesRepository.remove(specie);
     }

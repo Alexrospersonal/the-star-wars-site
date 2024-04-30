@@ -5,8 +5,11 @@ import { CreateFilmDto, UpdateFilmDto } from "./films.dto";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { PaginationType } from "src/people/people.pagination";
 import { FilmInterceptor } from "./films.interceptor";
+import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Films } from "./films.entity";
 
 @Controller('films')
+@ApiTags('films')
 export class FilmsController {
     constructor(
         private readonly filmsService: FilmsService
@@ -15,6 +18,9 @@ export class FilmsController {
     @Post()
     @UseInterceptors(FilmsImageStorageInterceptor)
     @UseInterceptors(FilmInterceptor)
+    @ApiResponse({ status: 200, description: 'Created', type: Films })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async create(
         @Body() filmsData: CreateFilmDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
@@ -25,6 +31,9 @@ export class FilmsController {
 
     @Get(':id')
     @UseInterceptors(FilmInterceptor)
+    @ApiResponse({ status: 200, description: 'OK', type: Films })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findOne(
         @Param('id', ParseIntPipe) id: number
     ) {
@@ -34,6 +43,10 @@ export class FilmsController {
 
     @Get()
     @UseInterceptors(FilmInterceptor)
+    @ApiQuery({ name: 'skip', required: false, type: Number })
+    @ApiResponse({ status: 200, description: 'OK', type: Films })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findAll(
         @Query() query: PaginationType
     ) {
@@ -44,6 +57,9 @@ export class FilmsController {
 
     @Patch(':id')
     @UseInterceptors(FilmInterceptor)
+    @ApiResponse({ status: 200, description: 'Updated', type: Films })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateFilm: UpdateFilmDto
@@ -54,6 +70,9 @@ export class FilmsController {
 
     @Delete(':id')
     @UseInterceptors(FilmInterceptor)
+    @ApiResponse({ status: 200, description: 'Deleted', type: Films })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async delete(
         @Param('id', ParseIntPipe) id: number
     ) {

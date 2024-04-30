@@ -28,7 +28,7 @@ async function changeDependencyDataToUrl(planet: Planet): PlanetType {
 
     return {
         ...planet,
-        films: films.map(film => `${BASE_URL}films/${film.id}`),
+        films: films ? films.map(film => `${BASE_URL}films/${film.id}`) : null,
         residents: residents.map(resident => `${BASE_URL}person/${resident.id}`),
     }
 }

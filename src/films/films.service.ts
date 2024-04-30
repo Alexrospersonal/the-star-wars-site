@@ -107,10 +107,14 @@ export class FilmsService {
     }
 
     async deleteFilm(id: number) {
-        const film = await this.filmsRepository.findOne({ where: { id: id } });
+        const film = await this.findFilm(id);
 
         if (!film)
             throw new NotFoundException(`Specie #${id} not found`);
+
+        for (const image of film.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         return await this.filmsRepository.remove(film);
     }

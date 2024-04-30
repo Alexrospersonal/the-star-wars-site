@@ -8,6 +8,7 @@ import { PeopleService } from "src/people/people.service";
 import { FileUrlTransformInterceptor } from "src/interceptors/fileUrlTransform.interceptor";
 import { FilmContainer } from "src/films/films.interface";
 import { Films } from "src/films/films.entity";
+import { Person } from "src/people/entities/people.entity";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
@@ -64,10 +65,14 @@ export class StarshipsService implements FilmContainer<Starships> {
     }
 
     async deleteStarship(id: number) {
-        const starship = await this.starshipRepository.findOne({ where: { id: id } });
+        const starship = await this.findStarship(id);
 
         if (!starship)
             throw new NotFoundException(`Starship #${id} not found`);
+
+        for (const image of starship.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         return await this.starshipRepository.remove(starship);
     }
@@ -91,5 +96,15 @@ export class StarshipsService implements FilmContainer<Starships> {
 
         entity.films = films;
         return await this.starshipRepository.save(entity);
+    }
+
+    public async addNewPilots(pilot: Person, vehicles: Starships[]) {
+        for (const vehicle of vehicles) {
+            const pilots = vehicle.pilots;
+            pilots.push(pilot);
+
+            vehicle.pilots = pilots;
+            await this.starshipRepository.save(vehicle);
+        }
     }
 }

@@ -5,8 +5,11 @@ import { ImageFileValidationPipe } from "src/files.validators";
 import { SpeciesImageStorageInterceptor } from "src/images/images.interceptor";
 import { CreateSpeciesDto, UpdateSpeciesDto } from "./species.dto";
 import { SpeciesInterceptor } from "./species.interceptor";
+import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { Species } from "./species.entity";
 
 @Controller('species')
+@ApiTags('species')
 export class SpeciesController {
     constructor(
         private readonly speciesService: SpeciesService
@@ -15,6 +18,9 @@ export class SpeciesController {
     @Post()
     @UseInterceptors(SpeciesImageStorageInterceptor)
     @UseInterceptors(SpeciesInterceptor)
+    @ApiResponse({ status: 200, description: 'Created', type: Species })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async create(
         @Body() specieCreateData: CreateSpeciesDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
@@ -25,6 +31,9 @@ export class SpeciesController {
 
     @Get(':id')
     @UseInterceptors(SpeciesInterceptor)
+    @ApiResponse({ status: 200, description: 'OK', type: Species })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findOne(@Param('id', ParseIntPipe) id: number) {
         const specie = await this.speciesService.findSpecie(id);
         return await specie.toResponseObject()
@@ -32,6 +41,10 @@ export class SpeciesController {
 
     @Get()
     @UseInterceptors(SpeciesInterceptor)
+    @ApiQuery({ name: 'skip', required: false, type: Number })
+    @ApiResponse({ status: 200, description: 'OK', type: Species })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
         const species = await this.speciesService.findSpecies(skip, 10);
@@ -40,6 +53,9 @@ export class SpeciesController {
 
     @Patch(':id')
     @UseInterceptors(SpeciesInterceptor)
+    @ApiResponse({ status: 200, description: 'Updated', type: Species })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async update(
         @Param('id', ParseIntPipe) id: number,
         @Body() updateSpecies: UpdateSpeciesDto
@@ -49,6 +65,9 @@ export class SpeciesController {
 
     @Delete(':id')
     @UseInterceptors(SpeciesInterceptor)
+    @ApiResponse({ status: 200, description: 'Deleted', type: Species })
+    @ApiResponse({ status: 400, description: 'Bad Request' })
+    @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async delete(@Param('id', ParseIntPipe) id: number) {
         return (await this.speciesService.deleteSpecie(id)).toResponseObject();
     }

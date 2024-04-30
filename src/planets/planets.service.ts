@@ -39,7 +39,6 @@ export class PlanetsService implements FilmContainer<Planet> {
             climate: planetData.climate,
             terrain: planetData.terrain,
             surface_water: planetData.surface_water,
-            // residents: Promise.resolve([]),
             images: images
         });
 
@@ -83,7 +82,11 @@ export class PlanetsService implements FilmContainer<Planet> {
     }
 
     public async deletePlanet(id: number) {
-        const planet = await this.planetRepository.findOne({ where: { id: id } });
+        const planet = await this.findOnePlanet(id);
+
+        for (const image of planet.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         if (!planet) {
             throw new NotFoundException(`Planet #${id} not found`);
@@ -91,15 +94,6 @@ export class PlanetsService implements FilmContainer<Planet> {
 
         return await this.planetRepository.remove(planet);
     }
-
-    // public async getHomeword(id: number) {
-    //     return await this.planetRepository.findOne({
-    //         where: {
-    //             id: id
-    //         },
-    //         relations: ['residents']
-    //     });
-    // }
 
     public async addNewResident(planet: Planet, resident: Person) {
         const residents = await planet.residents;
@@ -116,16 +110,6 @@ export class PlanetsService implements FilmContainer<Planet> {
         homeworld.species = Promise.resolve(species);
         return await this.planetRepository.save(homeworld);
     }
-
-    // public async removeResident(planet: Planet, resident: Person) {
-    //     const residents = await planet.residents;
-    //     planet.residents = Promise.resolve(
-    //         residents.filter((person, idx, arr) => {
-    //             person !== resident
-    //         })
-    //     )
-    //     await this.planetRepository.save(planet);
-    // }
 
     public async getPlanetByIds(ids: number[]) {
         const people = await this.planetRepository.find({

@@ -4,9 +4,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { DataTransformInteceptor } from './interceptors/dataTransform.interceptor';
 import { FileUrlTransformInterceptor } from './interceptors/fileUrlTransform.interceptor';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(express.urlencoded({ extended: true }));
 
   app.useGlobalInterceptors(
     new DataTransformInteceptor(),

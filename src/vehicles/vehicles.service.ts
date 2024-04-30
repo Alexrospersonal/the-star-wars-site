@@ -7,6 +7,7 @@ import { ImagesService } from "src/images/images.service";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
 import { Films } from "src/films/films.entity";
 import { FilmContainer } from "src/films/films.interface";
+import { Person } from "src/people/entities/people.entity";
 
 @Injectable()
 @UseInterceptors(FileUrlTransformInterceptor)
@@ -62,10 +63,14 @@ export class VehiclesService implements FilmContainer<Vehicles> {
     }
 
     async deleteVehicle(id: number) {
-        const vehicle = await this.vehiclesRepository.findOne({ where: { id: id } });
+        const vehicle = await this.findVehicle(id);
 
         if (!vehicle)
             throw new NotFoundException(`Vehicle #${id} not found`);
+
+        for (const image of vehicle.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
+        }
 
         return await this.vehiclesRepository.remove(vehicle);
     }
@@ -89,5 +94,15 @@ export class VehiclesService implements FilmContainer<Vehicles> {
 
         entity.films = films;
         return await this.vehiclesRepository.save(entity);
+    }
+
+    public async addNewPilots(pilot: Person, vehicles: Vehicles[]) {
+        for (const vehicle of vehicles) {
+            const pilots = vehicle.pilots;
+            pilots.push(pilot);
+
+            vehicle.pilots = pilots;
+            await this.vehiclesRepository.save(vehicle);
+        }
     }
 }
