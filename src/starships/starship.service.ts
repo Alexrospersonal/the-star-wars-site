@@ -32,13 +32,18 @@ export class StarshipsService implements FilmContainer<Starships> {
         return await this.starshipRepository.save(starship);
     }
 
-    findStarship(id: number) {
-        return this.starshipRepository.findOne({
+    async findStarship(id: number) {
+        const starship = await this.starshipRepository.findOne({
             where: {
                 id: id
             },
             relations: ['images', 'pilots', 'films']
         });
+
+        if (!starship)
+            throw new NotFoundException(`Starship #${id} not found`);
+
+        return starship;
     }
 
     findStarships(skip: number, take: number) {
@@ -85,7 +90,7 @@ export class StarshipsService implements FilmContainer<Starships> {
             relations: ['images', 'pilots', 'films']
         })
         if (!starships) {
-            throw new NotFoundException(`People not found`);
+            throw new NotFoundException(`Starships not found`);
         }
         return starships;
     }

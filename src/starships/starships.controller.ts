@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { StarshipsService } from "./starship.service";
 import { StarshipsImageStorageInterceptor } from "src/images/images.interceptor";
 import { ImageFileValidationPipe } from "src/files.validators";
@@ -26,8 +26,15 @@ export class StarshipsController {
         @Body() starshipData: CreateStarshipDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        const starship = await this.starshipsService.createStarship(starshipData, files);
-        return await starship.toResponseObject()
+        try {
+            const starship = await this.starshipsService.createStarship(starshipData, files);
+            return await starship.toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get(':id')
@@ -36,8 +43,15 @@ export class StarshipsController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findOne(@Param('id', ParseIntPipe) id: number) {
-        const starship = await this.starshipsService.findStarship(id);
-        return await starship.toResponseObject()
+        try {
+            const starship = await this.starshipsService.findStarship(id);
+            return await starship.toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get()
@@ -48,8 +62,13 @@ export class StarshipsController {
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        const starships = await this.starshipsService.findStarships(skip, 10);
-        return Promise.all(starships.map(async starship => await starship.toResponseObject()))
+
+        try {
+            const starships = await this.starshipsService.findStarships(skip, 10);
+            return Promise.all(starships.map(async starship => await starship.toResponseObject()))
+        } catch (error) {
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Patch(':id')
@@ -61,8 +80,15 @@ export class StarshipsController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateStarship: UpdateStarshipDto
     ) {
-        const starship = await this.starshipsService.updateStarship(id, updateStarship);
-        return await starship.toResponseObject()
+        try {
+            const starship = await this.starshipsService.updateStarship(id, updateStarship);
+            return await starship.toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Delete(':id')
@@ -71,7 +97,14 @@ export class StarshipsController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async delete(@Param('id', ParseIntPipe) id: number) {
-        const starship = await this.starshipsService.deleteStarship(id);
-        return await starship.toResponseObject()
+        try {
+            const starship = await this.starshipsService.deleteStarship(id);
+            return await starship.toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

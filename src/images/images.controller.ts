@@ -1,7 +1,9 @@
-import { Controller, Delete, Get, Param, Req, Res } from "@nestjs/common";
+import { Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Req, Res } from "@nestjs/common";
 import { Response } from "express";
 import * as path from "path";
 import { ImagesService } from "./images.service";
+import { existsSync } from "fs";
+import { NotFoundError } from "rxjs";
 
 @Controller('images')
 export class ImagesController {
@@ -15,11 +17,23 @@ export class ImagesController {
         @Res() res: Response
     ) {
         const file = path.join(process.cwd(), 'uploads', req.url);
-        return res.sendFile(file);
+
+        if (existsSync(file)) {
+            return res.sendFile(file);
+        }
+        throw new NotFoundException('Image not found');
+
     }
 
     @Delete(':id')
     async deleteImage(@Param('id') id: number) {
-        return await this.imagesService.deleteUploadedImage(id);
+        try {
+            return await this.imagesService.deleteUploadedImage(id);
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

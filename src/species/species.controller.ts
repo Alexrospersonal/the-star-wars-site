@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { SpeciesService } from "./species.service";
 import { PaginationType } from "src/people/people.pagination";
 import { ImageFileValidationPipe } from "src/files.validators";
@@ -25,8 +25,15 @@ export class SpeciesController {
         @Body() specieCreateData: CreateSpeciesDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        const specie = await this.speciesService.createSpecie(specieCreateData, files);
-        return (await this.speciesService.findSpecie(specie.id)).toResponseObject()
+        try {
+            const specie = await this.speciesService.createSpecie(specieCreateData, files);
+            return (await this.speciesService.findSpecie(specie.id)).toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get(':id')
@@ -35,8 +42,15 @@ export class SpeciesController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findOne(@Param('id', ParseIntPipe) id: number) {
-        const specie = await this.speciesService.findSpecie(id);
-        return await specie.toResponseObject()
+        try {
+            const specie = await this.speciesService.findSpecie(id);
+            return await specie.toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get()
@@ -47,8 +61,13 @@ export class SpeciesController {
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        const species = await this.speciesService.findSpecies(skip, 10);
-        return Promise.all(species.map(async specie => await specie.toResponseObject()))
+
+        try {
+            const species = await this.speciesService.findSpecies(skip, 10);
+            return Promise.all(species.map(async specie => await specie.toResponseObject()))
+        } catch (error) {
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Patch(':id')
@@ -60,7 +79,14 @@ export class SpeciesController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateSpecies: UpdateSpeciesDto
     ) {
-        return (await this.speciesService.updateSpecie(id, updateSpecies)).toResponseObject();
+        try {
+            return (await this.speciesService.updateSpecie(id, updateSpecies)).toResponseObject();
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Delete(':id')
@@ -69,6 +95,13 @@ export class SpeciesController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     public async delete(@Param('id', ParseIntPipe) id: number) {
-        return (await this.speciesService.deleteSpecie(id)).toResponseObject();
+        try {
+            return (await this.speciesService.deleteSpecie(id)).toResponseObject();
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

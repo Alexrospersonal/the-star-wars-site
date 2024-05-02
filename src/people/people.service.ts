@@ -77,13 +77,18 @@ export class PeopleService implements FilmContainer<Person> {
         return people;
     }
 
-    public findPerson(id: number) {
-        return this.peopleRepository.findOne({
+    public async findPerson(id: number) {
+        const person = await this.peopleRepository.findOne({
             where: {
                 id: id
             },
             relations: ['homeworld', 'specie', 'starships', 'vehicles', 'images', 'films']
         });
+
+        if (!person)
+            throw new NotFoundException(`Person #${id} not found`);
+
+        return person;
     }
 
     public async updatePerson(id: number, updatePersonData: UpdatePeopleDto) {
@@ -148,12 +153,12 @@ export class PeopleService implements FilmContainer<Person> {
     public async deletePerson(id: number) {
         const person = await this.findPerson(id)
 
+        if (!person)
+            throw new NotFoundException(`Person #${id} not found`);
+
         for (const image of person.images) {
             await this.imagesService.deleteUploadedImage(image.id)
         }
-
-        if (!person)
-            throw new NotFoundException(`Person #${id} not found`);
 
         return await this.peopleRepository.remove(person);
     }

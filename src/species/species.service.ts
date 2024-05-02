@@ -50,13 +50,18 @@ export class SpeciesService implements FilmContainer<Species> {
         return newSpecie
     }
 
-    findSpecie(id: number) {
-        return this.speciesRepository.findOne({
+    async findSpecie(id: number) {
+        const specie = await this.speciesRepository.findOne({
             where: {
                 id: id
             },
             relations: ['images', 'homeworld', 'people', 'films']
         })
+
+        if (!specie) {
+            throw new NotFoundException(`Specie #${id} not found`);
+        }
+        return specie
     }
 
     findSpecies(skip: number, take: number) {
@@ -78,6 +83,9 @@ export class SpeciesService implements FilmContainer<Species> {
 
         const updatedSpecie = await this.speciesRepository.preload(updateSpecie)
 
+        if (!updatedSpecie)
+            throw new NotFoundException(`Specie #${id} not found`)
+
         return await this.speciesRepository.save(updatedSpecie);
 
     }
@@ -96,16 +104,16 @@ export class SpeciesService implements FilmContainer<Species> {
     }
 
     public async getSpesiesByIds(ids: number[]) {
-        const specie = await this.speciesRepository.find({
+        const species = await this.speciesRepository.find({
             where: {
                 id: In(ids)
             },
             relations: ['images', 'homeworld', 'people', 'films']
         })
-        if (!specie) {
-            throw new NotFoundException(`People not found`);
+        if (!species) {
+            throw new NotFoundException(`Species not found`);
         }
-        return specie;
+        return species;
     }
 
     async addNewPerson(specie: Species, person: Person) {

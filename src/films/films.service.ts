@@ -68,13 +68,18 @@ export class FilmsService {
         }
     }
 
-    findFilm(id: number) {
-        return this.filmsRepository.findOne({
+    async findFilm(id: number) {
+        const film = await this.filmsRepository.findOne({
             where: {
                 id: id
             },
             relations: ['images', 'characters', 'planets', 'species', 'starships', 'vehicles']
         })
+
+        if (!film)
+            throw new NotFoundException(`Film #${id} not found`)
+
+        return film
     }
 
     findFilms(skip: number, take: number) {
@@ -101,7 +106,10 @@ export class FilmsService {
             vehicles: vehicles,
         }
 
-        const updatedFilm = await this.filmsRepository.preload(filmData)
+        const updatedFilm = await this.filmsRepository.preload(filmData);
+
+        if (!updateFilm)
+            throw new NotFoundException(`Film #${id} not found`)
 
         return await this.filmsRepository.save(updatedFilm);
     }
@@ -110,7 +118,7 @@ export class FilmsService {
         const film = await this.findFilm(id);
 
         if (!film)
-            throw new NotFoundException(`Specie #${id} not found`);
+            throw new NotFoundException(`Film #${id} not found`);
 
         for (const image of film.images) {
             await this.imagesService.deleteUploadedImage(image.id)
@@ -128,7 +136,7 @@ export class FilmsService {
         });
 
         if (!specie) {
-            throw new NotFoundException(`People not found`);
+            throw new NotFoundException(`Films #${ids} not found`);
         }
         return specie;
     }

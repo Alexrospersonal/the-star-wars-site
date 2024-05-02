@@ -23,6 +23,10 @@ export class PlanetsService implements FilmContainer<Planet> {
     async getOnePlanet(id: number) {
         const planet = await this.findOnePlanet(id);
 
+        if (!planet) {
+            throw new NotFoundException(`Planet #${id} not found`);
+        }
+
         return planet;
     }
 
@@ -84,12 +88,12 @@ export class PlanetsService implements FilmContainer<Planet> {
     public async deletePlanet(id: number) {
         const planet = await this.findOnePlanet(id);
 
-        for (const image of planet.images) {
-            await this.imagesService.deleteUploadedImage(image.id)
-        }
-
         if (!planet) {
             throw new NotFoundException(`Planet #${id} not found`);
+        }
+
+        for (const image of planet.images) {
+            await this.imagesService.deleteUploadedImage(image.id)
         }
 
         return await this.planetRepository.remove(planet);
@@ -112,16 +116,16 @@ export class PlanetsService implements FilmContainer<Planet> {
     }
 
     public async getPlanetByIds(ids: number[]) {
-        const people = await this.planetRepository.find({
+        const planets = await this.planetRepository.find({
             where: {
                 id: In(ids)
             },
             relations: ['residents', 'images', 'films']
         })
-        if (!people) {
-            throw new NotFoundException(`People not found`);
+        if (!planets) {
+            throw new NotFoundException(`PLanets not found`);
         }
-        return people;
+        return planets;
     }
 
     public async addNewFilmToEntity(entity: Planet, film: Films) {

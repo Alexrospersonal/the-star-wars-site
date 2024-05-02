@@ -30,13 +30,18 @@ export class VehiclesService implements FilmContainer<Vehicles> {
         return await this.vehiclesRepository.save(vehicle);
     }
 
-    findVehicle(id: number) {
-        return this.vehiclesRepository.findOne({
+    async findVehicle(id: number) {
+        const vehicle = await this.vehiclesRepository.findOne({
             where: {
                 id: id
             },
             relations: ['images', 'pilots', 'films']
         });
+
+        if (!vehicle)
+            throw new NotFoundException(`Vehicle #${id} not found`);
+
+        return vehicle;
     }
 
     findVehicles(skip: number, take: number) {
@@ -83,7 +88,7 @@ export class VehiclesService implements FilmContainer<Vehicles> {
             relations: ['images', 'pilots', 'films']
         })
         if (!vehicles) {
-            throw new NotFoundException(`People not found`);
+            throw new NotFoundException(`Vehicles not found`);
         }
         return vehicles;
     }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
@@ -25,9 +25,15 @@ export class PeopleController {
         @Body() createPeople: CreatePeopleDto,
         @UploadedFiles(new ImageFileValidationPipe()) files: Array<Express.Multer.File>
     ) {
-        const person = await this.peopleService.createPerson(createPeople, files);
-        return await (await this.peopleService.findOne(person.id)).toResponseObject()
-
+        try {
+            const person = await this.peopleService.createPerson(createPeople, files);
+            return await (await this.peopleService.findOne(person.id)).toResponseObject()
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Get()
@@ -38,8 +44,13 @@ export class PeopleController {
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     async findAll(@Query() query: PaginationType) {
         const skip = query.skip ? +query.skip : 0
-        const people = await this.peopleService.findPeople(skip, 10);
-        return Promise.all(people.map(async (people) => await people.toResponseObject()));
+
+        try {
+            const people = await this.peopleService.findPeople(skip, 10);
+            return Promise.all(people.map(async (people) => await people.toResponseObject()));
+        } catch (error) {
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @ApiProperty({ description: 'The id of the person' })
@@ -49,8 +60,15 @@ export class PeopleController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        const person = await this.peopleService.findPerson(id);
-        return await person.toResponseObject();
+        try {
+            const person = await this.peopleService.findPerson(id);
+            return await person.toResponseObject();
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Patch(':id')
@@ -62,7 +80,14 @@ export class PeopleController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updatePeople: UpdatePeopleDto
     ) {
-        return (await this.peopleService.updatePerson(id, updatePeople)).toResponseObject();
+        try {
+            return (await this.peopleService.updatePerson(id, updatePeople)).toResponseObject();
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Delete(':id')
@@ -71,6 +96,13 @@ export class PeopleController {
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
     async remove(@Param('id', ParseIntPipe) id: number) {
-        return (await this.peopleService.deletePerson(id)).toResponseObject();
+        try {
+            return (await this.peopleService.deletePerson(id)).toResponseObject();
+        } catch (error) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
