@@ -8,6 +8,7 @@ import { PlanetInterceptor } from "./planets.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "./planets.entity";
+import { Roles } from 'src/auth/auth.decorators';
 
 @Controller('planets')
 @ApiTags('planets')
@@ -17,6 +18,7 @@ export class PlanetsController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     @UseInterceptors(PlanetImageStorageInterceptor)
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Planet })
@@ -37,6 +39,7 @@ export class PlanetsController {
     }
 
     @Get()
+    @Roles(['admin', 'user'])
     @UseInterceptors(PlanetInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Planet })
@@ -54,6 +57,7 @@ export class PlanetsController {
     }
 
     @Get(':id')
+    @Roles(['admin', 'user'])
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'OK', type: Planet })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -70,6 +74,7 @@ export class PlanetsController {
     }
 
     @Patch(':id')
+    @Roles(['admin'])
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'Updated', type: Planet })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -89,6 +94,7 @@ export class PlanetsController {
     }
 
     @Delete(':id')
+    @Roles(['admin'])
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'Deleted', type: Planet })
     @ApiResponse({ status: 400, description: 'Bad Request' })

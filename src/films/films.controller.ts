@@ -7,6 +7,7 @@ import { PaginationType } from "src/people/people.pagination";
 import { FilmInterceptor } from "./films.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Films } from "./films.entity";
+import { Roles } from 'src/auth/auth.decorators';
 
 @Controller('films')
 @ApiTags('films')
@@ -16,6 +17,7 @@ export class FilmsController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     @UseInterceptors(FilmsImageStorageInterceptor)
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Films })
@@ -37,6 +39,7 @@ export class FilmsController {
     }
 
     @Get(':id')
+    @Roles(['admin', 'user'])
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'OK', type: Films })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -56,6 +59,7 @@ export class FilmsController {
     }
 
     @Get()
+    @Roles(['admin', 'user'])
     @UseInterceptors(FilmInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Films })
@@ -75,6 +79,7 @@ export class FilmsController {
     }
 
     @Patch(':id')
+    @Roles(['admin'])
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'Updated', type: Films })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -95,6 +100,7 @@ export class FilmsController {
     }
 
     @Delete(':id')
+    @Roles(['admin'])
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'Deleted', type: Films })
     @ApiResponse({ status: 400, description: 'Bad Request' })

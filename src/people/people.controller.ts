@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, Req, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
@@ -7,9 +7,7 @@ import { PeopleImageStorageInterceptor } from 'src/images/images.interceptor';
 import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PersonInterceptor } from './people.interceptos';
 import { Person } from './entities/people.entity';
-import { AuthsGuard } from 'src/guards/auth.guard';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Roles } from 'src/auth/auth.decorators';
 
 @Controller('people')
 @ApiTags('people')
@@ -19,6 +17,7 @@ export class PeopleController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     @UseInterceptors(PeopleImageStorageInterceptor)
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Person })
@@ -42,12 +41,15 @@ export class PeopleController {
     // TODO: додати до всіх роутерів або глобально JwtAuthGuard
     // @UseGuards(JwtAuthGuard)
     @Get()
+    @Roles(['admin', 'user'])
     @UseInterceptors(PersonInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })
     @ApiResponse({ status: 500, description: 'Internal Server Error' })
-    async findAll(@Query() query: PaginationType) {
+    async findAll(@Query() query: PaginationType, @Req() req) {
+        console.log(req)
+
         const skip = query.skip ? +query.skip : 0
 
         try {
@@ -58,8 +60,8 @@ export class PeopleController {
         }
     }
 
-    @ApiProperty({ description: 'The id of the person' })
     @Get(':id')
+    @Roles(['admin', 'user'])
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'OK', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -77,6 +79,7 @@ export class PeopleController {
     }
 
     @Patch(':id')
+    @Roles(['admin'])
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'Updated', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -96,6 +99,7 @@ export class PeopleController {
     }
 
     @Delete(':id')
+    @Roles(['admin'])
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'Deleted', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })

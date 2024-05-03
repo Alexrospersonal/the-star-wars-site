@@ -7,6 +7,7 @@ import { CreateSpeciesDto, UpdateSpeciesDto } from "./species.dto";
 import { SpeciesInterceptor } from "./species.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Species } from "./species.entity";
+import { Roles } from 'src/auth/auth.decorators';
 
 @Controller('species')
 @ApiTags('species')
@@ -16,6 +17,7 @@ export class SpeciesController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     @UseInterceptors(SpeciesImageStorageInterceptor)
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Species })
@@ -37,6 +39,7 @@ export class SpeciesController {
     }
 
     @Get(':id')
+    @Roles(['admin', 'user'])
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'OK', type: Species })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -54,6 +57,7 @@ export class SpeciesController {
     }
 
     @Get()
+    @Roles(['admin', 'user'])
     @UseInterceptors(SpeciesInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Species })
@@ -71,6 +75,7 @@ export class SpeciesController {
     }
 
     @Patch(':id')
+    @Roles(['admin'])
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'Updated', type: Species })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -90,6 +95,7 @@ export class SpeciesController {
     }
 
     @Delete(':id')
+    @Roles(['admin'])
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'Deleted', type: Species })
     @ApiResponse({ status: 400, description: 'Bad Request' })

@@ -7,6 +7,7 @@ import { PaginationType } from "src/people/people.pagination";
 import { StarshipsInterceptor } from "./starship.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Starships } from "./starship.entity";
+import { Roles } from 'src/auth/auth.decorators';
 
 
 @Controller('starships')
@@ -17,6 +18,7 @@ export class StarshipsController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     @UseInterceptors(StarshipsImageStorageInterceptor)
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Starships })
@@ -38,6 +40,7 @@ export class StarshipsController {
     }
 
     @Get(':id')
+    @Roles(['admin', 'user'])
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'OK', type: Starships })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -55,6 +58,7 @@ export class StarshipsController {
     }
 
     @Get()
+    @Roles(['admin', 'user'])
     @UseInterceptors(StarshipsInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Starships })
@@ -72,6 +76,7 @@ export class StarshipsController {
     }
 
     @Patch(':id')
+    @Roles(['admin'])
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'Updated', type: Starships })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -92,6 +97,7 @@ export class StarshipsController {
     }
 
     @Delete(':id')
+    @Roles(['admin'])
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'Deleted', type: Starships })
     @ApiResponse({ status: 400, description: 'Bad Request' })
