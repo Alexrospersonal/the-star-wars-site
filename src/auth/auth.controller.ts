@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { UsersDto } from 'src/users/users.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { Public } from './auth.decorators';
 
 @Controller('auth')
 export class AuthController {
@@ -10,6 +11,7 @@ export class AuthController {
         private readonly authService: AuthService
     ) { }
 
+    @Public()
     @Post('register')
     async register(@Body() createUserDto: UsersDto) {
         try {
@@ -26,6 +28,7 @@ export class AuthController {
     //     return user;
     // }
 
+    @Public()
     @UseGuards(AuthGuard('local'))
     @Post('login')
     async login(@Request() req) {

@@ -16,6 +16,7 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './auth/local.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthsGuard } from './guards/auth.guard';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -31,6 +32,12 @@ import { AuthsGuard } from './guards/auth.guard';
       synchronize: true
     }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, FilmsModule, UsersModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    }
+  ]
 })
 export class AppModule { private dataSouce: DataSource }
