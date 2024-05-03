@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
@@ -7,6 +7,9 @@ import { PeopleImageStorageInterceptor } from 'src/images/images.interceptor';
 import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PersonInterceptor } from './people.interceptos';
 import { Person } from './entities/people.entity';
+import { AuthsGuard } from 'src/guards/auth.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('people')
 @ApiTags('people')
@@ -36,6 +39,8 @@ export class PeopleController {
         }
     }
 
+    // TODO: додати до всіх роутерів або глобально JwtAuthGuard
+    // @UseGuards(JwtAuthGuard)
     @Get()
     @UseInterceptors(PersonInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })

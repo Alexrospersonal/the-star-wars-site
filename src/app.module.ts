@@ -10,9 +10,16 @@ import { SpeciesModule } from './species/species.module';
 import { StarshipsModule } from './starships/starships.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { FilmsModule } from './films/films.module';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
+import { LocalStrategy } from './auth/local.strategy';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthsGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
+    PassportModule.register({ defaultStrategy: 'local' }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -22,8 +29,8 @@ import { FilmsModule } from './films/films.module';
       database: 'star_wars',
       autoLoadEntities: true,
       synchronize: true
-    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, FilmsModule],
+    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, FilmsModule, UsersModule, AuthModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule { private dataSouce: DataSource }
