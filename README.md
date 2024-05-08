@@ -77,9 +77,10 @@ $ npm run test:e2e
 ```
 
 ## Project Structure
-src/: Application code
-test/: Tests
-dist/: Compiled code (generated during build)
+
+- `src/`: Application code
+- `test/`: Tests
+- `dist/`: Compiled code (generated during build)
 
 
 ## Contribution
