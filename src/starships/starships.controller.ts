@@ -8,6 +8,7 @@ import { StarshipsInterceptor } from "./starship.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Starships } from "./starship.entity";
 import { Roles } from 'src/auth/auth.decorators';
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 
 @Controller('starships')
@@ -19,7 +20,8 @@ export class StarshipsController {
 
     @Post()
     @Roles(['admin'])
-    @UseInterceptors(StarshipsImageStorageInterceptor)
+    // @UseInterceptors(StarshipsImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Starships })
     @ApiResponse({ status: 400, description: 'Bad Request' })

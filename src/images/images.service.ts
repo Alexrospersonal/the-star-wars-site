@@ -36,17 +36,17 @@ export class ImagesService {
         throw new NotFoundException(`Image #${id} can't be deleted`);
     }
 
-    private async saveImage(file: Express.Multer.File) {
-        const name = file.path;
+    private async saveImage(file: Express.Multer.File, folder: string) {
+        const name = folder + '/' + file.originalname;
         const image = this.imageRepository.create({ name });
         return await this.imageRepository.save(image);
     }
 
-    public async saveImages(files: Array<Express.Multer.File>) {
+    public async saveImages(files: Array<Express.Multer.File>, folder: string) {
         const images: Image[] = [];
 
         for (const file of files) {
-            images.push(await this.saveImage(file));
+            images.push(await this.saveImage(file, folder));
         }
 
         return images;
@@ -66,15 +66,26 @@ export class ImagesService {
         return await this.imageRepository.findOne({ where: { id: id } });
     }
 
-    async upload(filename: string, file: Buffer) {
+    async upload(filename: string, folder: string, file: Buffer) {
         await this.s3Client.send(
             new PutObjectCommand({
                 Bucket: 'tswuploader',
-                Key: filename,
+                Key: folder + '/' + filename,
                 Body: file,
             })
         )
     }
+
+    async uploadImages(files: Express.Multer.File[], folder: string) {
+        const images = await this.saveImages(files, folder);
+
+        for (const file of files) {
+            await this.upload(file.originalname, folder, file.buffer);
+        }
+
+        return images;
+    }
+
 
     async getFile(filename: string) {
         const command = new GetObjectCommand({

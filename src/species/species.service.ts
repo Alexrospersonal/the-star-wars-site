@@ -24,7 +24,7 @@ export class SpeciesService implements FilmContainer<Species> {
     }
 
     async createSpecie(specieData: CreateSpeciesDto, files: Express.Multer.File[]) {
-        const images = await this.imagesService.saveImages(files);
+        const images = await this.imagesService.saveImages(files, 'species');
 
         let homeworld: Planet;
 

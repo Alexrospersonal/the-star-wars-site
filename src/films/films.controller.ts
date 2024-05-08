@@ -8,6 +8,7 @@ import { FilmInterceptor } from "./films.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Films } from "./films.entity";
 import { Roles } from 'src/auth/auth.decorators';
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('films')
 @ApiTags('films')
@@ -18,7 +19,8 @@ export class FilmsController {
 
     @Post()
     @Roles(['admin'])
-    @UseInterceptors(FilmsImageStorageInterceptor)
+    // @UseInterceptors(FilmsImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Films })
     @ApiResponse({ status: 400, description: 'Bad Request' })

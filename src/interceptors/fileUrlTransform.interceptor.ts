@@ -59,10 +59,10 @@ export class FileUrlTransformInterceptor implements NestInterceptor {
     public convertFilenametoURL(images: Image[]) {
         const url = images.map(image => {
             const splitedPath = image.name.split('\\');
-            const name = splitedPath[splitedPath.length - 1];
-            const folder = splitedPath[splitedPath.length - 2];
+            // const name = splitedPath[splitedPath.length - 1];
+            // const folder = splitedPath[splitedPath.length - 2];
 
-            return `${IMAGE_BASE_URL}/${folder}/${name}`;
+            return `${IMAGE_BASE_URL}/${image.name}`;
             // return {
             //     id: image.id,
             //     name: `${IMAGE_BASE_URL}/${folder}/${name}`,

@@ -9,6 +9,7 @@ import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Person } from "src/people/entities/people.entity";
 import { Planet } from "./planets.entity";
 import { Roles } from 'src/auth/auth.decorators';
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('planets')
 @ApiTags('planets')
@@ -19,7 +20,8 @@ export class PlanetsController {
 
     @Post()
     @Roles(['admin'])
-    @UseInterceptors(PlanetImageStorageInterceptor)
+    // @UseInterceptors(PlanetImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Planet })
     @ApiResponse({ status: 400, description: 'Bad Request' })

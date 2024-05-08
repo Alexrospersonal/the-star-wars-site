@@ -33,7 +33,7 @@ export class FilmsService {
     ) { }
 
     async createFilm(filmsData: CreateFilmDto, files: Express.Multer.File[]) {
-        const images = await this.imagesService.saveImages(files);
+        const images = await this.imagesService.saveImages(files, 'films');
 
         const characters = await this.peopleService.getPeopleByIds(filmsData.characters);
         const planets = await this.planetsService.getPlanetByIds(filmsData.planets);

@@ -16,23 +16,46 @@ import { PassportModule } from '@nestjs/passport';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UploadService } from './upload/upload.service';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     PassportModule.register({ defaultStrategy: 'local' }),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '123456',
-      database: 'star_wars',
-      autoLoadEntities: true,
-      synchronize: true
-    }), PeopleModule, ImagesModule, PlanetsModule, SpeciesModule, StarshipsModule, VehiclesModule, FilmsModule, UsersModule, AuthModule],
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true
+      }),
+      inject: [ConfigService]
+    }),
+    // TypeOrmModule.forRoot({
+    //   type: 'mysql',
+    //   host: 'localhost',
+    //   port: 3306,
+    //   username: 'root',
+    //   password: '123456',
+    //   database: 'star_wars',
+    //   autoLoadEntities: true,
+    //   synchronize: true
+    // }),
+    PeopleModule,
+    ImagesModule,
+    PlanetsModule,
+    SpeciesModule,
+    StarshipsModule,
+    VehiclesModule,
+    FilmsModule,
+    UsersModule,
+    AuthModule],
   controllers: [AppController],
   providers: [
     AppService,

@@ -22,7 +22,7 @@ export class StarshipsService implements FilmContainer<Starships> {
 
 
     async createStarship(starshipData: CreateStarshipDto, files: Express.Multer.File[]) {
-        const images = await this.imagesService.saveImages(files);
+        const images = await this.imagesService.saveImages(files, 'starships');
 
         const starship = this.starshipRepository.create({
             ...starshipData,

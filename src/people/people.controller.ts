@@ -8,6 +8,7 @@ import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PersonInterceptor } from './people.interceptos';
 import { Person } from './entities/people.entity';
 import { Roles } from 'src/auth/auth.decorators';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('people')
 @ApiTags('people')
@@ -18,7 +19,8 @@ export class PeopleController {
 
     @Post()
     @Roles(['admin'])
-    @UseInterceptors(PeopleImageStorageInterceptor)
+    // @UseInterceptors(PeopleImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })

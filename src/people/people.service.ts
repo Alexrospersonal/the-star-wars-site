@@ -33,7 +33,8 @@ export class PeopleService implements FilmContainer<Person> {
     }
 
     public async createPerson(personData: CreatePeopleDto, files: Array<Express.Multer.File>) {
-        const images = await this.imagesService.saveImages(files);
+        // const images = await this.imagesService.saveImages(files);
+        const images = await this.imagesService.uploadImages(files, 'people');
 
         const homeworld = await this.planetsService.getOnePlanet(personData.homeworld);
         const specie = await this.speciesService.findSpecie(personData.specie);

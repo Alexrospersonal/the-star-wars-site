@@ -7,6 +7,7 @@ import { PaginationType } from "src/people/people.pagination";
 import { VehiclesInterceptor } from "./vehicles.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Vehicles } from "./vehicles.entity";
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('vehicles')
 @ApiTags('vehicles')
@@ -16,7 +17,8 @@ export class vehiclesController {
     ) { }
 
     @Post()
-    @UseInterceptors(VehiclessImageStorageInterceptor)
+    // @UseInterceptors(VehiclessImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(VehiclesInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Vehicles })
     @ApiResponse({ status: 400, description: 'Bad Request' })

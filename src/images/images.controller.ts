@@ -51,21 +51,21 @@ export class ImagesController {
             ]
         })
     ) file: Express.Multer.File) {
-        await this.imagesService.upload(file.originalname, file.buffer)
+        // await this.imagesService.upload(file.originalname, file.buffer)
     }
 
     // Допрацювати щоб всі файли зберігались на amazon s3
     @Public()
-    @Get(':filename')
+    @Get('*')
     async getFile(
-        @Param('filename') filename: string,
+        @Req() req: Request,
         @Res() res: Response) {
-        const fileBuffer = await this.imagesService.getFile(filename);
+        const fileBuffer = await this.imagesService.getFile(req.url.replace('/images/', ''));
 
         if (fileBuffer instanceof Buffer) {
             // TODO: замінити контент тайп на image/* і провірити роботу
-            res.setHeader('Content-Type', 'image/jpeg');
-            res.send(Buffer.from(fileBuffer));
+            res.setHeader('Content-Type', 'image/*');
+            return res.send(Buffer.from(fileBuffer));
         }
         throw new NotFoundException('Image not found');
     }

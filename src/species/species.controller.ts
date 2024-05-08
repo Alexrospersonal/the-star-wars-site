@@ -8,6 +8,7 @@ import { SpeciesInterceptor } from "./species.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Species } from "./species.entity";
 import { Roles } from 'src/auth/auth.decorators';
+import { FilesInterceptor } from "@nestjs/platform-express";
 
 @Controller('species')
 @ApiTags('species')
@@ -18,7 +19,8 @@ export class SpeciesController {
 
     @Post()
     @Roles(['admin'])
-    @UseInterceptors(SpeciesImageStorageInterceptor)
+    // @UseInterceptors(SpeciesImageStorageInterceptor)
+    @UseInterceptors(FilesInterceptor('files'))
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Species })
     @ApiResponse({ status: 400, description: 'Bad Request' })
