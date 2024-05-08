@@ -23,12 +23,19 @@
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+<h1>Star Wars - NestJS Project</h1>
+This project implements [The Star Wars Site] using NestJS, TypeScript, MySQL, and Amazon S3 for data storage.
 
 ## Installation
 
+
+
 ```bash
+1. Clone this repository:
+$ git clone https://github.com/username/the-star-wars-site.git
+
+cd the-star-wars-site
+
 $ npm install
 ```
 
