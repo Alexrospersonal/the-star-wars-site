@@ -37,16 +37,6 @@ import { UploadService } from './upload/upload.service';
       }),
       inject: [ConfigService]
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'mysql',
-    //   host: 'localhost',
-    //   port: 3306,
-    //   username: 'root',
-    //   password: '123456',
-    //   database: 'star_wars',
-    //   autoLoadEntities: true,
-    //   synchronize: true
-    // }),
     PeopleModule,
     ImagesModule,
     PlanetsModule,
