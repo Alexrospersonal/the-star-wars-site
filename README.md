@@ -36,7 +36,21 @@ $ git clone https://github.com/username/the-star-wars-site.git
 
 cd the-star-wars-site
 
+Install dependencies:
 $ npm install
+
+Create a .env file in the project root directory and specify settings for connecting to the MySQL database and accessing Amazon S3:
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=star_wars
+
+AWS_S3_BUCKET=your_s3_bucket
+AWS_ACCESS_KEY_ID=your_access_key_id
+AWS_SECRET_ACCESS_KEY=your_secret_access_key
+AWS_REGION=your_s3_region
 ```
 
 ## Running the app
