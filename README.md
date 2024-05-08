@@ -24,10 +24,10 @@
 
 ## Description
 <h1>Star Wars - NestJS Project</h1>
-This project implements [The Star Wars Site] using NestJS, TypeScript, MySQL, and Amazon S3 for data storage.
+This project implements [The Star Wars API] using NestJS, TypeScript, MySQL, and Amazon S3 for data storage.
+
 
 ## Installation
-
 
 
 ```bash
@@ -63,7 +63,7 @@ $ npm run start
 $ npm run start:dev
 
 # production mode
-$ npm run start:prod
+$ npm run build
 ```
 
 ## Test
@@ -74,21 +74,23 @@ $ npm run test
 
 # e2e tests
 $ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
-## Support
+## Project Structure
+src/: Application code
+test/: Tests
+dist/: Compiled code (generated during build)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+
+## Contribution
+Feel free to contribute, make changes, and create pull requests.
+
 
 ## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Author - Oleksandr Riznychuk
+
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is released into the public domain and has no license. You are free to use it for any purpose without any restrictions.
