@@ -1,16 +1,24 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Body, Injectable, NotFoundException } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { Image } from "./images.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import * as path from "path";
 import * as fs from "fs";
 import * as util from "util";
+import { ConfigService } from "@nestjs/config";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 @Injectable()
 export class ImagesService {
+
+    private readonly s3Client = new S3Client({
+        region: this.configService.getOrThrow('AWS_S3_REGION'),
+    });
+
     constructor(
         @InjectRepository(Image)
         private imageRepository: Repository<Image>,
+        private readonly configService: ConfigService,
     ) { }
 
     public async deleteUploadedImage(id: number) {
@@ -56,5 +64,24 @@ export class ImagesService {
 
     public async getOneImage(id: number) {
         return await this.imageRepository.findOne({ where: { id: id } });
+    }
+
+    async upload(filename: string, file: Buffer) {
+        await this.s3Client.send(
+            new PutObjectCommand({
+                Bucket: 'tswuploader',
+                Key: filename,
+                Body: file,
+            })
+        )
+    }
+
+    async getFile(filename: string) {
+        const command = new GetObjectCommand({
+            Bucket: 'tswuploader',
+            Key: filename,
+        });
+        const { Body, ...rest } = await this.s3Client.send(command);
+        return Body instanceof Buffer ? Body : Buffer.from(await Body?.transformToByteArray());
     }
 }

@@ -13,13 +13,15 @@ import { FilmsModule } from './films/films.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './auth/local.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { ConfigModule } from '@nestjs/config';
+import { UploadService } from './upload/upload.service';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     PassportModule.register({ defaultStrategy: 'local' }),
     TypeOrmModule.forRoot({
       type: 'mysql',
@@ -41,7 +43,8 @@ import { RolesGuard } from './auth/roles.guard';
     {
       provide: APP_GUARD,
       useClass: RolesGuard
-    }
+    },
+    UploadService
   ]
 })
 export class AppModule { private dataSouce: DataSource }
