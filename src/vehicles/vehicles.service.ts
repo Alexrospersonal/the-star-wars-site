@@ -20,7 +20,7 @@ export class VehiclesService implements FilmContainer<Vehicles> {
     ) { }
 
     async createVehicle(vehicleData: CreateVehicleDto, files: Express.Multer.File[]) {
-        const images = await this.imagesService.saveImages(files, 'vehicles');
+        const images = await this.imagesService.uploadImages(files, 'vehicles');
 
         const vehicle = this.vehiclesRepository.create({
             ...vehicleData,

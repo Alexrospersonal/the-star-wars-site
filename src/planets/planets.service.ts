@@ -31,7 +31,7 @@ export class PlanetsService implements FilmContainer<Planet> {
     }
 
     public async createPlanet(planetData: CreatePlanetDto, files: Array<Express.Multer.File>) {
-        const images = await this.imagesService.saveImages(files, 'planets');
+        const images = await this.imagesService.uploadImages(files, 'planets');
 
         const planet = this.planetRepository.create({
             name: planetData.name,
