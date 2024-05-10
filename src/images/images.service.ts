@@ -37,7 +37,7 @@ export class ImagesService {
     }
 
     private async saveImage(file: Express.Multer.File, folder: string) {
-        const name = folder + '/' + file.originalname;
+        const name = folder + '/' + file.filename;
         const image = this.imageRepository.create({ name });
         return await this.imageRepository.save(image);
     }
@@ -80,7 +80,7 @@ export class ImagesService {
         const images = await this.saveImages(files, folder);
 
         for (const file of files) {
-            await this.upload(file.originalname, folder, file.buffer);
+            await this.upload(file.filename, folder, file.buffer);
         }
 
         return images;

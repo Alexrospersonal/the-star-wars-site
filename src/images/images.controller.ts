@@ -64,7 +64,7 @@ export class ImagesController {
 
         if (fileBuffer instanceof Buffer) {
             // TODO: замінити контент тайп на image/* і провірити роботу
-            res.setHeader('Content-Type', 'image/*');
+            res.setHeader('Content-Type', 'image/jpeg');
             return res.send(Buffer.from(fileBuffer));
         }
         throw new NotFoundException('Image not found');

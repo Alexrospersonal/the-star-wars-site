@@ -114,7 +114,7 @@ export class Vehicles {
     @ApiProperty({
         description: 'An array of images resource URLs.'
     })
-    @OneToMany(() => Image, (image) => image.starship)
+    @OneToMany(() => Image, (image) => image.vehicle)
     images: Image[]
 
     @ApiProperty({

@@ -3,7 +3,7 @@ import { PeopleService } from './people.service';
 import { CreatePeopleDto, UpdatePeopleDto } from './people.dto';
 import { PaginationType } from './people.pagination';
 import { ImageFileValidationPipe } from 'src/files.validators';
-import { PeopleImageStorageInterceptor } from 'src/images/images.interceptor';
+import { ImageRenameInterceptor, PeopleImageStorageInterceptor } from 'src/images/images.interceptor';
 import { ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PersonInterceptor } from './people.interceptos';
 import { Person } from './entities/people.entity';
@@ -20,7 +20,7 @@ export class PeopleController {
     @Post()
     @Roles(['admin'])
     // @UseInterceptors(PeopleImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(PersonInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Person })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -43,7 +43,7 @@ export class PeopleController {
     // TODO: додати до всіх роутерів або глобально JwtAuthGuard
     // @UseGuards(JwtAuthGuard)
     @Get()
-    @Roles(['admin', 'user'])
+    @Roles(['admin'])
     @UseInterceptors(PersonInterceptor)
     @ApiQuery({ name: 'skip', required: false, type: Number })
     @ApiResponse({ status: 200, description: 'OK', type: Person })

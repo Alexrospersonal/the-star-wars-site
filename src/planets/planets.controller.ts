@@ -3,7 +3,7 @@ import { CreatePlanetDto, UpdatePlanetDto } from "./planets.dto";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { PaginationType } from "src/people/people.pagination";
 import { PlanetsService } from "./planets.service";
-import { PlanetImageStorageInterceptor } from "src/images/images.interceptor";
+import { ImageRenameInterceptor, PlanetImageStorageInterceptor } from "src/images/images.interceptor";
 import { PlanetInterceptor } from "./planets.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Person } from "src/people/entities/people.entity";
@@ -21,7 +21,7 @@ export class PlanetsController {
     @Post()
     @Roles(['admin'])
     // @UseInterceptors(PlanetImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(PlanetInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Planet })
     @ApiResponse({ status: 400, description: 'Bad Request' })

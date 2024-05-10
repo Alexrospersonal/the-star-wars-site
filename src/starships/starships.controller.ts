@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { StarshipsService } from "./starship.service";
-import { StarshipsImageStorageInterceptor } from "src/images/images.interceptor";
+import { ImageRenameInterceptor, StarshipsImageStorageInterceptor } from "src/images/images.interceptor";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { CreateStarshipDto, UpdateStarshipDto } from "./starship.dto";
 import { PaginationType } from "src/people/people.pagination";
@@ -21,7 +21,7 @@ export class StarshipsController {
     @Post()
     @Roles(['admin'])
     // @UseInterceptors(StarshipsImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(StarshipsInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Starships })
     @ApiResponse({ status: 400, description: 'Bad Request' })

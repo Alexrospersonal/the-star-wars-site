@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundExcep
 import { SpeciesService } from "./species.service";
 import { PaginationType } from "src/people/people.pagination";
 import { ImageFileValidationPipe } from "src/files.validators";
-import { SpeciesImageStorageInterceptor } from "src/images/images.interceptor";
+import { ImageRenameInterceptor, SpeciesImageStorageInterceptor } from "src/images/images.interceptor";
 import { CreateSpeciesDto, UpdateSpeciesDto } from "./species.dto";
 import { SpeciesInterceptor } from "./species.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -20,7 +20,7 @@ export class SpeciesController {
     @Post()
     @Roles(['admin'])
     // @UseInterceptors(SpeciesImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(SpeciesInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Species })
     @ApiResponse({ status: 400, description: 'Bad Request' })

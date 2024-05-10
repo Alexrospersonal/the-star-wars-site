@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilmsService } from "./films.service";
-import { FilmsImageStorageInterceptor } from "src/images/images.interceptor";
+import { FilmsImageStorageInterceptor, ImageRenameInterceptor } from "src/images/images.interceptor";
 import { CreateFilmDto, UpdateFilmDto } from "./films.dto";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { PaginationType } from "src/people/people.pagination";
@@ -20,7 +20,7 @@ export class FilmsController {
     @Post()
     @Roles(['admin'])
     // @UseInterceptors(FilmsImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(FilmInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Films })
     @ApiResponse({ status: 400, description: 'Bad Request' })

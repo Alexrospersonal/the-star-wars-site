@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { VehiclesService } from "./vehicles.service";
-import { VehiclessImageStorageInterceptor } from "src/images/images.interceptor";
+import { ImageRenameInterceptor, VehiclessImageStorageInterceptor } from "src/images/images.interceptor";
 import { ImageFileValidationPipe } from "src/files.validators";
 import { CreateVehicleDto, UpdateVehicleDto } from "./vehicles.dto";
 import { PaginationType } from "src/people/people.pagination";
@@ -8,6 +8,7 @@ import { VehiclesInterceptor } from "./vehicles.interceptor";
 import { ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Vehicles } from "./vehicles.entity";
 import { FilesInterceptor } from "@nestjs/platform-express";
+import { Roles } from 'src/auth/auth.decorators';
 
 @Controller('vehicles')
 @ApiTags('vehicles')
@@ -17,8 +18,9 @@ export class vehiclesController {
     ) { }
 
     @Post()
+    @Roles(['admin'])
     // @UseInterceptors(VehiclessImageStorageInterceptor)
-    @UseInterceptors(FilesInterceptor('files'))
+    @UseInterceptors(ImageRenameInterceptor)
     @UseInterceptors(VehiclesInterceptor)
     @ApiResponse({ status: 200, description: 'Created', type: Vehicles })
     @ApiResponse({ status: 400, description: 'Bad Request' })
@@ -29,12 +31,12 @@ export class vehiclesController {
     ) {
         try {
             const vehicle = await this.vehiclesService.createVehicle(vehicleData, files);
-            return await vehicle.toResponseObject()
+            return (await this.vehiclesService.findVehicle(vehicle.id)).toResponseObject();
         } catch (error) {
             if (error instanceof NotFoundException) {
                 throw error;
             }
-            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
